@@ -1,0 +1,11 @@
+@use './base/' as *;
+
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+canvas {
+  background-color: black;
+}
