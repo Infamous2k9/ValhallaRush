@@ -7,6 +7,13 @@ export class PlayerModel extends EntityModel {
   attack = 20;
 
   constructor() {
-    super(20, 200, '../../assets/player/knight.png');
+    super(20, 320, '../../assets/player/knight.png');
+  }
+
+  moveRight(value: number) {
+    this.position_x += value;
+  }
+  moveLeft(value: number) {
+    this.position_x -= value;
   }
 }
