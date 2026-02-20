@@ -9,20 +9,12 @@ export class PlayerModel extends EntityModel {
   height = 175;
   width = 175;
 
-  currentImage = 0;
-
   constructor() {
     super(20, 300, '../../assets/player/knight.png');
     this.loadImageCache(PLAYER.walk);
     this.animate(PLAYER.walk);
   }
 
-  moveRight(value: number) {
-    this.position_x += value;
-  }
-  moveLeft(value: number) {
-    this.position_x -= value;
-  }
   animate(stateArr: string[]) {
     setInterval(() => {
       let i = this.currentImage % stateArr.length;

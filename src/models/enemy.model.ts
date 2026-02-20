@@ -11,6 +11,8 @@ export class EnemyModel extends EntityModel {
   constructor() {
     super(200 + Math.random() * 500, 320, '../../assets/enemys/golem_1/Idle/0_Golem_Idle_000.png');
     this.otherDirection = true;
+    this.speed = this.speed * (Math.random() * 0.25);
+
     this.loadImageCache(GOLEM_1.walking);
     this.animate();
   }
@@ -21,9 +23,5 @@ export class EnemyModel extends EntityModel {
       this.image = this.imageCache[path];
       this.currentImage++;
     }, 1000 / GOLEM_1.walking.length);
-  }
-
-  moveR(value: number) {
-    console.log(value);
   }
 }

@@ -4,6 +4,8 @@ export class EntityModel {
   image = new Image();
   imageCache: Record<string, HTMLImageElement> = {};
   otherDirection = false;
+  currentImage = 0;
+  speed = 0.15;
 
   constructor(start_x: number, start_y: number, img: string) {
     this.position_x = start_x;
@@ -17,5 +19,11 @@ export class EntityModel {
       img.src = path;
       this.imageCache[path] = img;
     });
+  }
+  moveRight() {
+    this.position_x += this.speed;
+  }
+  moveLeft() {
+    this.position_x -= this.speed;
   }
 }
