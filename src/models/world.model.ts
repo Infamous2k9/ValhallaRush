@@ -68,12 +68,13 @@ export class WorldModel {
 
   loadEnemy(object: EnemyModel) {
     if (!this.ctx) return;
-    return this.ctx.drawImage(
-      object.image,
-      object.position_x,
-      object.position_y,
-      object.height,
-      object.width
-    );
+
+    this.ctx.save();
+    this.ctx.translate(object.width + object.position_x, 0);
+    this.ctx.scale(-1, 1);
+
+    this.ctx.drawImage(object.image, 0, object.position_y, object.height, object.width);
+
+    this.ctx.restore();
   }
 }

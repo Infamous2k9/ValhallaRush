@@ -2,7 +2,8 @@ export class EntityModel {
   position_x: number;
   position_y: number;
   image = new Image();
-  imageCache: any = {};
+  imageCache: Record<string, HTMLImageElement> = {};
+  otherDirection = false;
 
   constructor(start_x: number, start_y: number, img: string) {
     this.position_x = start_x;
