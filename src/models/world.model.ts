@@ -1,12 +1,14 @@
 import { Background } from './background.model';
 import { EnemyModel } from './enemy.model';
+import { Keyboard } from './keyboard.model';
 import { PlayerModel } from './player.model';
 
 export class WorldModel {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D | null;
-  player = new PlayerModel();
+  player: PlayerModel;
   enemies = [new EnemyModel(), new EnemyModel()];
+  keyboard: Keyboard;
 
   bgObjects = [
     new Background(0, 0, '../../assets/battlegrounds/Battleground1/Bright/sky.png'),
@@ -18,10 +20,16 @@ export class WorldModel {
     new Background(0, 170, '../../assets/battlegrounds/Battleground1/Bright/stones&grass.png'),
   ];
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, keyboard: Keyboard) {
     this.canvas = canvas;
+    this.keyboard = keyboard;
     this.ctx = canvas.getContext('2d');
+    this.player = new PlayerModel(this);
+    this.setWorld();
     this.draw();
+  }
+  setWorld() {
+    this.player.world = this;
   }
   //verstehe noch nicht warum da ne arrow func hin muss irgendwas wegen this????
   //wurde im video 12.2.10 erklärt aber etwas anders
@@ -34,11 +42,11 @@ export class WorldModel {
     //load background objects
     this.bgObjects.forEach((object) => this.loadBackground(object));
 
-    //load player
-    this.loadPlayer(this.player);
-
     //load enemies
     this.enemies.forEach((enemy) => this.loadEnemy(enemy));
+
+    //load player
+    this.loadPlayer(this.player);
 
     //redraw all
     requestAnimationFrame(this.draw);
@@ -57,23 +65,32 @@ export class WorldModel {
 
   loadPlayer(object: PlayerModel) {
     if (!this.ctx) return;
-    return this.ctx.drawImage(
-      object.image,
-      object.position_x,
-      object.position_y,
-      object.height,
-      object.width
-    );
+    if (object.otherDirection) {
+      this.flipObject(object);
+    } else {
+      this.drawObject(object);
+    }
   }
 
   loadEnemy(object: EnemyModel) {
     if (!this.ctx) return;
+    this.flipObject(object);
+  }
 
+  drawObject(obj: EnemyModel | PlayerModel) {
+    if (!this.ctx) return;
+
+    this.ctx.drawImage(obj.image, obj.position_x, obj.position_y, obj.width, obj.height);
+  }
+
+  flipObject(obj: EnemyModel | PlayerModel) {
+    if (!this.ctx) return;
     this.ctx.save();
-    this.ctx.translate(object.width + object.position_x, 0);
+
+    this.ctx.translate(obj.position_x + obj.width / 2, 0);
     this.ctx.scale(-1, 1);
 
-    this.ctx.drawImage(object.image, 0, object.position_y, object.height, object.width);
+    this.ctx.drawImage(obj.image, 0, obj.position_y, obj.width, obj.height);
 
     this.ctx.restore();
   }

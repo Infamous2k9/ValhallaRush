@@ -1,5 +1,6 @@
 import { PLAYER } from '../data/player.data';
 import { EntityModel } from './entity.model';
+import type { WorldModel } from './world.model';
 
 export class PlayerModel extends EntityModel {
   healthPoints = 100;
@@ -8,19 +9,37 @@ export class PlayerModel extends EntityModel {
   attack = 20;
   height = 175;
   width = 175;
+  world: WorldModel | null = null;
 
-  constructor() {
-    super(20, 300, '../../assets/player/knight.png');
+  constructor(world: WorldModel) {
+    super(20, 290, '../../assets/player/knight.png');
+    this.world = world;
+    this.speed = 6;
     this.loadImageCache(PLAYER.walk);
-    this.animate(PLAYER.walk);
+    this.animate();
   }
 
-  animate(stateArr: string[]) {
+  animate() {
     setInterval(() => {
-      let i = this.currentImage % stateArr.length;
-      let path = stateArr[i];
-      this.image = this.imageCache[path];
-      this.currentImage++;
-    }, 1000 / stateArr.length);
+      if (!this.world) return;
+      if (this.world.keyboard.RIGHT) {
+        this.moveRight();
+        this.otherDirection = false;
+      }
+      if (this.world.keyboard.LEFT) {
+        this.moveLeft();
+        this.otherDirection = true;
+      }
+    }, 1000 / 25);
+
+    setInterval(() => {
+      if (!this.world) return;
+      if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
+        let i = this.currentImage % PLAYER.walk.length;
+        let path = PLAYER.walk[i];
+        this.image = this.imageCache[path];
+        this.currentImage++;
+      }
+    }, 1000 / PLAYER.walk.length);
   }
 }
