@@ -40,4 +40,22 @@ export const PLAYER = {
     './assets/player/Jump/jump6.png',
     './assets/player/Jump/jump7.png',
   ],
+  death: [
+    './assets/player/Death/death1.png',
+    './assets/player/Death/death2.png',
+    './assets/player/Death/death3.png',
+    './assets/player/Death/death4.png',
+    './assets/player/Death/death5.png',
+    './assets/player/Death/death6.png',
+    './assets/player/Death/death7.png',
+    './assets/player/Death/death8.png',
+    './assets/player/Death/death9.png',
+    './assets/player/Death/death10.png',
+  ],
+  attack: [
+    './assets/player/Attack/attack1.png',
+    './assets/player/Attack/attack2.png',
+    './assets/player/Attack/attack3.png',
+    './assets/player/Attack/attack4.png',
+  ],
 };
