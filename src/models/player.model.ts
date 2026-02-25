@@ -12,7 +12,7 @@ export class PlayerModel extends EntityModel {
   world: WorldModel | null = null;
 
   constructor(world: WorldModel) {
-    super(20, 290, '../../assets/player/knight.png');
+    super(20, 290, './assets/player/knight.png');
     this.world = world;
     this.speed = 6;
     this.loadImageCache(PLAYER.walk);
@@ -20,16 +20,19 @@ export class PlayerModel extends EntityModel {
   }
 
   animate() {
+    if (!this.world) return;
+
     setInterval(() => {
       if (!this.world) return;
-      if (this.world.keyboard.RIGHT) {
+      if (this.world.keyboard.RIGHT && this.position_x < this.world.level.endLevelX) {
         this.moveRight();
         this.otherDirection = false;
       }
-      if (this.world.keyboard.LEFT) {
+      if (this.world.keyboard.LEFT && this.position_x > -100) {
         this.moveLeft();
         this.otherDirection = true;
       }
+      this.world.POV_X = -this.position_x + 100;
     }, 1000 / 25);
 
     setInterval(() => {

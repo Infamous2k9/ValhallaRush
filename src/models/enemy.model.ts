@@ -1,6 +1,6 @@
 import { GOLEM_1 } from '../data/golem_1.data';
-import { GOLEM_2 } from '../data/golem_2.data';
-import { GOLEM_3 } from '../data/golem_3.data';
+//import { GOLEM_2 } from '../data/golem_2.data';
+//import { GOLEM_3 } from '../data/golem_3.data';
 import { EntityModel } from './entity.model';
 
 export class EnemyModel extends EntityModel {
@@ -10,7 +10,7 @@ export class EnemyModel extends EntityModel {
   width = 150;
 
   constructor() {
-    super(200 + Math.random() * 500, 320, '../../assets/enemys/golem_1/Idle/0_Golem_Idle_000.png');
+    super(200 + Math.random() * 500, 320, './assets/enemys/golem_1/Idle/0_Golem_Idle_000.png');
     this.otherDirection = true;
     this.speed = this.speed * (Math.random() * 3);
 

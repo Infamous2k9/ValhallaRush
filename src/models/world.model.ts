@@ -1,3 +1,4 @@
+import { level1 } from '../data/levels/level1';
 import { Background } from './background.model';
 import { EnemyModel } from './enemy.model';
 import { Keyboard } from './keyboard.model';
@@ -7,18 +8,10 @@ export class WorldModel {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D | null;
   player: PlayerModel;
-  enemies = [new EnemyModel(), new EnemyModel()];
   keyboard: Keyboard;
+  POV_X = 0;
 
-  bgObjects = [
-    new Background(0, 0, '../../assets/battlegrounds/Battleground1/Bright/sky.png'),
-    new Background(0, 10, '../../assets/battlegrounds/Battleground1/Bright/ruins_bg.png'),
-    new Background(0, 70, '../../assets/battlegrounds/Battleground1/Bright/hills&trees.png'),
-    new Background(0, 80, '../../assets/battlegrounds/Battleground1/Bright/ruins.png'),
-    new Background(0, 100, '../../assets/battlegrounds/Battleground1/Bright/ruins2.png'),
-    new Background(0, 140, '../../assets/battlegrounds/Battleground1/Bright/statue.png'),
-    new Background(0, 170, '../../assets/battlegrounds/Battleground1/Bright/stones&grass.png'),
-  ];
+  level = level1;
 
   constructor(canvas: HTMLCanvasElement, keyboard: Keyboard) {
     this.canvas = canvas;
@@ -39,14 +32,15 @@ export class WorldModel {
     //clear Canvas
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+    this.ctx.translate(this.POV_X, 0);
     //load background objects
-    this.bgObjects.forEach((object) => this.loadBackground(object));
-
+    this.level.backgroundObjects.forEach((object) => this.loadBackground(object));
     //load enemies
-    this.enemies.forEach((enemy) => this.loadEnemy(enemy));
-
+    this.level.enemies.forEach((enemy) => this.loadEnemy(enemy));
     //load player
     this.loadPlayer(this.player);
+
+    this.ctx.translate(-this.POV_X, 0);
 
     //redraw all
     requestAnimationFrame(this.draw);
