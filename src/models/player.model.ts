@@ -12,10 +12,11 @@ export class PlayerModel extends EntityModel {
   world: WorldModel | null = null;
 
   constructor(world: WorldModel) {
-    super(20, 290, './assets/player/knight.png');
+    super(-500, 90, './assets/player/knight.png');
     this.world = world;
     this.speed = 6;
     this.loadImageCache(PLAYER.walk);
+    this.aplyGravity();
     this.animate();
   }
 

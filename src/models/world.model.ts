@@ -1,5 +1,6 @@
 import { level1 } from '../data/levels/level1';
 import { Background } from './background.model';
+import type { EndbossModel } from './endboss.model';
 import { EnemyModel } from './enemy.model';
 import { Keyboard } from './keyboard.model';
 import { PlayerModel } from './player.model';
@@ -37,6 +38,7 @@ export class WorldModel {
     this.level.backgroundObjects.forEach((object) => this.loadBackground(object));
     //load enemies
     this.level.enemies.forEach((enemy) => this.loadEnemy(enemy));
+    this.loadEnemy(this.level.endboss);
     //load player
     this.loadPlayer(this.player);
 
@@ -66,7 +68,7 @@ export class WorldModel {
     }
   }
 
-  loadEnemy(object: EnemyModel) {
+  loadEnemy(object: EnemyModel | EndbossModel) {
     if (!this.ctx) return;
     this.flipObject(object);
   }

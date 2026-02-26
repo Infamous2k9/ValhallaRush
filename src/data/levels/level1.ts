@@ -1,9 +1,13 @@
 import { Level } from '../../models/level.model';
 import { EnemyModel } from '../../models/enemy.model';
 import { Background } from '../../models/background.model';
+import { EndbossModel } from '../../models/endboss.model';
 
 export const level1 = new Level(
-  [new EnemyModel(), new EnemyModel()],
+  [new EnemyModel(), new EnemyModel(), new EnemyModel(), new EnemyModel()],
+
+  new EndbossModel(),
+
   [
     new Background(-720, 0, './assets/battlegrounds/Battleground1/Bright/sky.png'),
     new Background(-720, 10, './assets/battlegrounds/Battleground1/Bright/ruins_bg.png'),
