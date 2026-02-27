@@ -7,15 +7,28 @@ export class PlayerModel extends EntityModel {
   runes = 0;
   stamina = 120;
   attack = 20;
-  height = 175;
-  width = 175;
+
+  isOnGround = true;
+
   world: WorldModel | null = null;
 
   constructor(world: WorldModel) {
-    super(-500, 90, './assets/player/knight.png');
+    super(-500, 290, './assets/player/knight.png');
     this.world = world;
     this.speed = 6;
+    this.height = 175;
+    this.width = 175;
+
+    this.offsets.bottom = 75;
+    this.offsets.right = 110;
+    this.offsets.left = 32;
+    this.offsets.top = 95;
+
+    this.loadImageCache(['./assets/player/knight.png']);
     this.loadImageCache(PLAYER.walk);
+    this.loadImageCache(PLAYER.jump);
+    this.loadImageCache(PLAYER.idle);
+
     this.aplyGravity();
     this.animate();
   }
@@ -29,21 +42,27 @@ export class PlayerModel extends EntityModel {
         this.moveRight();
         this.otherDirection = false;
       }
-      if (this.world.keyboard.LEFT && this.position_x > -100) {
+      if (this.world.keyboard.LEFT && this.position_x > this.startPosition) {
         this.moveLeft();
         this.otherDirection = true;
       }
+
+      if (this.world.keyboard.UP && !this.isAboveGround()) {
+        this.jump();
+      }
+
       this.world.POV_X = -this.position_x + 100;
     }, 1000 / 25);
 
     setInterval(() => {
       if (!this.world) return;
-      if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
-        let i = this.currentImage % PLAYER.walk.length;
-        let path = PLAYER.walk[i];
-        this.image = this.imageCache[path];
-        this.currentImage++;
+      if (this.isAboveGround()) {
+        this.playAnimation(PLAYER.jump);
+      } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
+        this.playAnimation(PLAYER.walk);
+      } else {
+        this.playAnimation(['./assets/player/knight.png']);
       }
-    }, 1000 / PLAYER.walk.length);
+    }, 1000 / PLAYER.idle.length);
   }
 }

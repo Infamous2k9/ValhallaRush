@@ -4,7 +4,7 @@ import { Background } from '../../models/background.model';
 import { EndbossModel } from '../../models/endboss.model';
 
 export const level1 = new Level(
-  [new EnemyModel(), new EnemyModel(), new EnemyModel(), new EnemyModel()],
+  [new EnemyModel()],
 
   new EndbossModel(),
 

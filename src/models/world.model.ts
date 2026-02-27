@@ -2,6 +2,7 @@ import { level1 } from '../data/levels/level1';
 import { Background } from './background.model';
 import type { EndbossModel } from './endboss.model';
 import { EnemyModel } from './enemy.model';
+import type { EntityModel } from './entity.model';
 import { Keyboard } from './keyboard.model';
 import { PlayerModel } from './player.model';
 
@@ -21,7 +22,16 @@ export class WorldModel {
     this.player = new PlayerModel(this);
     this.setWorld();
     this.draw();
+    this.checkCollisions();
   }
+  checkCollisions() {
+    setInterval(() => {
+      this.level.enemies.forEach((enemy) => {
+        if (this.player.isColliding(enemy)) console.log('colliding with: ', enemy);
+      });
+    }, 200);
+  }
+
   setWorld() {
     this.player.world = this;
   }
@@ -37,10 +47,16 @@ export class WorldModel {
     //load background objects
     this.level.backgroundObjects.forEach((object) => this.loadBackground(object));
     //load enemies
-    this.level.enemies.forEach((enemy) => this.loadEnemy(enemy));
-    this.loadEnemy(this.level.endboss);
+    this.level.enemies.forEach((enemy) => {
+      this.drawEnemy(enemy);
+      this.drawRectEnemy(enemy);
+      this.drawEnemyHitbox(enemy);
+    });
+    this.drawEnemy(this.level.endboss);
     //load player
-    this.loadPlayer(this.player);
+    this.drawPlayer(this.player);
+    this.drawRectPlayer(this.player);
+    this.drawPlayerHitbox(this.player);
 
     this.ctx.translate(-this.POV_X, 0);
 
@@ -58,36 +74,104 @@ export class WorldModel {
       this.canvas.height
     );
   }
-
-  loadPlayer(object: PlayerModel) {
+  //Player draw funcs
+  drawPlayer(obj: PlayerModel) {
     if (!this.ctx) return;
-    if (object.otherDirection) {
-      this.flipObject(object);
+    if (obj.otherDirection) {
+      this.ctx.save();
+      this.ctx.translate(obj.width, 0);
+      this.ctx.scale(-1, 1);
+      obj.position_x = obj.position_x * -1;
+      this.ctx.drawImage(obj.image, obj.position_x + 42, obj.position_y, obj.width, obj.height);
     } else {
-      this.drawObject(object);
+      this.ctx.drawImage(obj.image, obj.position_x, obj.position_y, obj.width, obj.height);
+    }
+
+    if (obj.otherDirection) {
+      obj.position_x = obj.position_x * -1;
+      this.ctx.restore();
     }
   }
 
-  loadEnemy(object: EnemyModel | EndbossModel) {
+  drawRectPlayer(obj: PlayerModel) {
     if (!this.ctx) return;
-    this.flipObject(object);
+
+    this.ctx.beginPath();
+    this.ctx.lineWidth = 5;
+    this.ctx.strokeStyle = 'blue';
+    if (obj.otherDirection) {
+      this.ctx.rect(obj.position_x - 42, obj.position_y, obj.width, obj.height);
+    } else {
+      this.ctx.rect(obj.position_x, obj.position_y, obj.width, obj.height);
+    }
+    this.ctx.stroke();
   }
 
-  drawObject(obj: EnemyModel | PlayerModel) {
+  drawPlayerHitbox(obj: PlayerModel) {
     if (!this.ctx) return;
 
+    this.ctx.beginPath();
+    this.ctx.lineWidth = 5;
+    this.ctx.strokeStyle = 'red';
+    if (obj.otherDirection) {
+      this.ctx.rect(
+        obj.position_x + obj.offsets.left,
+        obj.position_y + obj.offsets.bottom,
+        obj.width - obj.offsets.right,
+        obj.height - obj.offsets.top
+      );
+    } else {
+      this.ctx.rect(
+        obj.position_x + obj.offsets.left,
+        obj.position_y + obj.offsets.bottom,
+        obj.width - obj.offsets.right,
+        obj.height - obj.offsets.top
+      );
+    }
+    this.ctx.stroke();
+  }
+
+  //enemy draw funcs
+  drawEnemy(obj: EnemyModel | EndbossModel) {
+    if (!this.ctx) return;
+    if (obj.otherDirection) {
+      this.ctx.save();
+      this.ctx.translate(obj.width, 0);
+      this.ctx.scale(-1, 1);
+      obj.position_x = obj.position_x * -1;
+    }
     this.ctx.drawImage(obj.image, obj.position_x, obj.position_y, obj.width, obj.height);
+
+    if (obj.otherDirection) {
+      obj.position_x = obj.position_x * -1;
+      this.ctx.restore();
+    }
   }
 
-  flipObject(obj: EnemyModel | PlayerModel) {
+  drawRectEnemy(obj: EnemyModel | EndbossModel) {
     if (!this.ctx) return;
-    this.ctx.save();
 
-    this.ctx.translate(obj.position_x + obj.width / 2, 0);
-    this.ctx.scale(-1, 1);
+    this.ctx.beginPath();
+    this.ctx.lineWidth = 5;
+    this.ctx.strokeStyle = 'blue';
+    this.ctx.rect(obj.position_x, obj.position_y, obj.width, obj.height);
+    this.ctx.stroke();
+  }
 
-    this.ctx.drawImage(obj.image, 0, obj.position_y, obj.width, obj.height);
+  //irgendwas stimmt mit dem spiegeln nicht deswegen kommt die hitbox nicht klar
 
-    this.ctx.restore();
+  drawEnemyHitbox(obj: EnemyModel) {
+    if (!this.ctx) return;
+
+    this.ctx.beginPath();
+    this.ctx.lineWidth = 5;
+    this.ctx.strokeStyle = 'red';
+    this.ctx.rect(
+      obj.position_x + obj.offsets.left,
+      obj.position_y + obj.offsets.bottom,
+      obj.width - obj.offsets.right,
+      obj.height - obj.offsets.top
+    );
+    this.ctx.stroke();
   }
 }
