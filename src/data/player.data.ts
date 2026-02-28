@@ -58,4 +58,10 @@ export const PLAYER = {
     './assets/player/Attack/attack3.png',
     './assets/player/Attack/attack4.png',
   ],
+  hurt: [
+    './assets/player/Hurt/hurt1.png',
+    './assets/player/Hurt/hurt2.png',
+    './assets/player/Hurt/hurt3.png',
+    './assets/player/Hurt/hurt4.png',
+  ],
 };

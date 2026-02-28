@@ -13,16 +13,18 @@ export class EndbossModel extends EntityModel {
     this.height = 300;
     this.width = 300;
 
-    this.offsets.bottom = 73;
-    this.offsets.top = 120;
-    this.offsets.left = 80;
-    this.offsets.right = 170;
+    this.offsets.bottom = 40;
+    this.offsets.top = 70;
+    this.offsets.left = 70;
+    this.offsets.right = 70;
 
     this.loadImageCache(GOLEM_3.walking);
     this.animate();
   }
   animate() {
-    //setInterval muss noch geschrieben werden
-    this.playAnimation(GOLEM_3.walking);
+    setInterval(() => {
+      this.playAnimation(GOLEM_3.walking);
+      //this.moveLeft();
+    }, 1000 / 25);
   }
 }

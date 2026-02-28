@@ -4,8 +4,7 @@ import { GOLEM_1 } from '../data/golem_1.data';
 import { EntityModel } from './entity.model';
 
 export class EnemyModel extends EntityModel {
-  healthPoints = 100;
-  attack = 20;
+  attack = 5;
 
   constructor() {
     //später justieren
@@ -14,10 +13,10 @@ export class EnemyModel extends EntityModel {
     this.speed = 2;
     this.speed = this.speed * (Math.random() * 2);
 
-    this.offsets.bottom = 35;
-    this.offsets.top = 50;
-    this.offsets.right = 80;
-    this.offsets.left = 40;
+    this.offsets.bottom = 20;
+    this.offsets.top = 30;
+    this.offsets.right = 30;
+    this.offsets.left = 30;
 
     this.loadImageCache(GOLEM_1.walking);
     this.animate();

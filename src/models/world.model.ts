@@ -12,6 +12,7 @@ export class WorldModel {
   player: PlayerModel;
   keyboard: Keyboard;
   POV_X = 0;
+  debugMode = true;
 
   level = level1;
 
@@ -23,12 +24,21 @@ export class WorldModel {
     this.setWorld();
     this.draw();
     this.checkCollisions();
+    this.initDebugToggle();
   }
   checkCollisions() {
     setInterval(() => {
+      //Enemies Collision
       this.level.enemies.forEach((enemy) => {
-        if (this.player.isColliding(enemy)) console.log('colliding with: ', enemy);
+        if (this.player.isColliding(enemy)) {
+          this.player.takeDamage(enemy.attack);
+          console.log('take dmg: ', this.player.healthPoints);
+        }
       });
+      //Endboss Collision
+      if (this.player.isColliding(this.level.endboss)) {
+        console.log('colliding with: ', this.level.endboss);
+      }
     }, 200);
   }
 
@@ -45,18 +55,28 @@ export class WorldModel {
 
     this.ctx.translate(this.POV_X, 0);
     //load background objects
-    this.level.backgroundObjects.forEach((object) => this.loadBackground(object));
+    this.level.backgroundObjects.forEach((bg) => this.loadBackground(bg));
     //load enemies
     this.level.enemies.forEach((enemy) => {
       this.drawEnemy(enemy);
-      this.drawRectEnemy(enemy);
-      this.drawEnemyHitbox(enemy);
+      //Enemiy Debug
+      if (this.debugMode) {
+        this.drawSpriteBox(enemy);
+        this.drawHitbox(enemy);
+      }
     });
     this.drawEnemy(this.level.endboss);
+    if (this.debugMode) {
+      this.drawSpriteBox(this.level.endboss);
+      this.drawHitbox(this.level.endboss);
+    }
     //load player
     this.drawPlayer(this.player);
-    this.drawRectPlayer(this.player);
-    this.drawPlayerHitbox(this.player);
+    // Player Debug
+    if (this.debugMode) {
+      this.drawSpriteBox(this.player);
+      this.drawHitbox(this.player);
+    }
 
     this.ctx.translate(-this.POV_X, 0);
 
@@ -74,64 +94,24 @@ export class WorldModel {
       this.canvas.height
     );
   }
-  //Player draw funcs
+
   drawPlayer(obj: PlayerModel) {
     if (!this.ctx) return;
+
     if (obj.otherDirection) {
       this.ctx.save();
       this.ctx.translate(obj.width, 0);
       this.ctx.scale(-1, 1);
       obj.position_x = obj.position_x * -1;
       this.ctx.drawImage(obj.image, obj.position_x + 42, obj.position_y, obj.width, obj.height);
-    } else {
+    } else if (!obj.otherDirection) {
       this.ctx.drawImage(obj.image, obj.position_x, obj.position_y, obj.width, obj.height);
     }
-
     if (obj.otherDirection) {
       obj.position_x = obj.position_x * -1;
       this.ctx.restore();
     }
   }
-
-  drawRectPlayer(obj: PlayerModel) {
-    if (!this.ctx) return;
-
-    this.ctx.beginPath();
-    this.ctx.lineWidth = 5;
-    this.ctx.strokeStyle = 'blue';
-    if (obj.otherDirection) {
-      this.ctx.rect(obj.position_x - 42, obj.position_y, obj.width, obj.height);
-    } else {
-      this.ctx.rect(obj.position_x, obj.position_y, obj.width, obj.height);
-    }
-    this.ctx.stroke();
-  }
-
-  drawPlayerHitbox(obj: PlayerModel) {
-    if (!this.ctx) return;
-
-    this.ctx.beginPath();
-    this.ctx.lineWidth = 5;
-    this.ctx.strokeStyle = 'red';
-    if (obj.otherDirection) {
-      this.ctx.rect(
-        obj.position_x + obj.offsets.left,
-        obj.position_y + obj.offsets.bottom,
-        obj.width - obj.offsets.right,
-        obj.height - obj.offsets.top
-      );
-    } else {
-      this.ctx.rect(
-        obj.position_x + obj.offsets.left,
-        obj.position_y + obj.offsets.bottom,
-        obj.width - obj.offsets.right,
-        obj.height - obj.offsets.top
-      );
-    }
-    this.ctx.stroke();
-  }
-
-  //enemy draw funcs
   drawEnemy(obj: EnemyModel | EndbossModel) {
     if (!this.ctx) return;
     if (obj.otherDirection) {
@@ -148,30 +128,33 @@ export class WorldModel {
     }
   }
 
-  drawRectEnemy(obj: EnemyModel | EndbossModel) {
+  drawSpriteBox(object: EntityModel) {
     if (!this.ctx) return;
 
-    this.ctx.beginPath();
-    this.ctx.lineWidth = 5;
     this.ctx.strokeStyle = 'blue';
-    this.ctx.rect(obj.position_x, obj.position_y, obj.width, obj.height);
-    this.ctx.stroke();
+    this.ctx.lineWidth = 1;
+    this.ctx.strokeRect(object.position_x, object.position_y, object.width, object.height);
   }
 
-  //irgendwas stimmt mit dem spiegeln nicht deswegen kommt die hitbox nicht klar
-
-  drawEnemyHitbox(obj: EnemyModel) {
+  drawHitbox(object: EntityModel) {
     if (!this.ctx) return;
 
-    this.ctx.beginPath();
-    this.ctx.lineWidth = 5;
+    const x = object.position_x + object.offsets.left;
+    const y = object.position_y + object.offsets.top;
+    const width = object.width - object.offsets.left - object.offsets.right;
+    const height = object.height - object.offsets.top - object.offsets.bottom;
+
     this.ctx.strokeStyle = 'red';
-    this.ctx.rect(
-      obj.position_x + obj.offsets.left,
-      obj.position_y + obj.offsets.bottom,
-      obj.width - obj.offsets.right,
-      obj.height - obj.offsets.top
-    );
-    this.ctx.stroke();
+    this.ctx.lineWidth = 2;
+    this.ctx.strokeRect(x, y, width, height);
+  }
+
+  initDebugToggle() {
+    window.addEventListener('keydown', (event) => {
+      if (event.key.toLowerCase() === 'h') {
+        this.debugMode = !this.debugMode;
+        console.log('Debug Mode:', this.debugMode);
+      }
+    });
   }
 }

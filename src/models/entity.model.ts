@@ -1,4 +1,6 @@
 export class EntityModel {
+  healthPoints = 100;
+
   position_x: number;
   position_y: number;
   height = 150;
@@ -9,6 +11,13 @@ export class EntityModel {
     bottom: 0,
     left: 0,
   };
+  //death animation muss angepasst werden
+  deathOffset = {
+    posX: 0,
+    posY: 0,
+    height: 0,
+    witdh: 0,
+  };
 
   image = new Image();
   imageCache: Record<string, HTMLImageElement> = {};
@@ -18,6 +27,7 @@ export class EntityModel {
   speedY = 0;
   aceletration = 2;
   startPosition = -500;
+  lastHit = 0;
 
   constructor(start_x: number, start_y: number, img: string) {
     this.position_x = start_x;
@@ -54,6 +64,24 @@ export class EntityModel {
   jump() {
     this.speedY = 25;
   }
+  isHurt() {
+    let timePassed = new Date().getTime() - this.lastHit;
+    timePassed = timePassed / 1000;
+    return timePassed < 0.8;
+  }
+
+  takeDamage(value: number) {
+    this.healthPoints -= value;
+    if (this.healthPoints < 0) {
+      this.healthPoints = 0;
+    } else {
+      this.lastHit = new Date().getTime();
+    }
+  }
+
+  isDead() {
+    return this.healthPoints === 0;
+  }
 
   playAnimation(animationArr: string[]) {
     let i = this.currentImage % animationArr.length;
@@ -62,42 +90,24 @@ export class EntityModel {
     this.currentImage++;
   }
 
-  // isColliding(object: EntityModel) {
-  //   return (
-  //     this.position_x + this.width > object.position_x &&
-  //     this.position_y + this.height > object.position_y &&
-  //     this.position_x < object.position_x + object.width &&
-  //     this.position_y < object.position_y + object.height
-  //   );
-  // }
-  isColliding(object: EntityModel) {
+  isColliding(object: EntityModel): boolean {
+    const tolerance = 0;
+
+    const thisLeft = this.position_x + this.offsets.left - tolerance;
+    const thisRight = this.position_x + this.width - this.offsets.right + tolerance;
+    const thisTop = this.position_y + this.offsets.top - tolerance;
+    const thisBottom = this.position_y + this.height - this.offsets.bottom + tolerance;
+
+    const objectLeft = object.position_x + object.offsets.left;
+    const objectRight = object.position_x + object.width - object.offsets.right;
+    const objectTop = object.position_y + object.offsets.top;
+    const objectBottom = object.position_y + object.height - object.offsets.bottom;
+
     return (
-      this.position_x + this.offsets.left + this.width - this.offsets.right - this.offsets.left >
-        object.position_x + object.offsets.left &&
-      this.position_y + this.offsets.top + this.height - this.offsets.bottom >
-        object.position_y + object.offsets.top &&
-      this.position_x + this.offsets.left <
-        object.position_x +
-          object.offsets.left +
-          object.width -
-          object.offsets.left -
-          object.offsets.right &&
-      this.position_y + this.offsets.top <
-        object.position_y +
-          object.offsets.top +
-          object.height -
-          object.offsets.top -
-          object.offsets.bottom
+      thisRight > objectLeft &&
+      thisBottom > objectTop &&
+      thisLeft < objectRight &&
+      thisTop < objectBottom
     );
   }
-
-  // isColliding(object: EntityModel) {
-  //   return (
-  //     this.position_x + this.width - this.offsets.right > object.position_x + object.offsets.left &&
-  //     this.position_y + this.height - this.offsets.bottom >
-  //       object.position_y + object.offsets.top &&
-  //     this.position_x + this.offsets.left < object.position_x - object.offsets.right &&
-  //     this.position_y + this.offsets.top < object.position_y + object.height - object.offsets.bottom
-  //   );
-  // }
 }

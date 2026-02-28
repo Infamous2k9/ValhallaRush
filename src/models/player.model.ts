@@ -19,15 +19,18 @@ export class PlayerModel extends EntityModel {
     this.height = 175;
     this.width = 175;
 
-    this.offsets.bottom = 75;
-    this.offsets.right = 110;
-    this.offsets.left = 32;
-    this.offsets.top = 95;
+    this.offsets.bottom = 25;
+    this.offsets.right = 85;
+    this.offsets.left = 40;
+    this.offsets.top = 80;
 
     this.loadImageCache(['./assets/player/knight.png']);
     this.loadImageCache(PLAYER.walk);
     this.loadImageCache(PLAYER.jump);
     this.loadImageCache(PLAYER.idle);
+    this.loadImageCache(PLAYER.death);
+    this.loadImageCache(PLAYER.attack);
+    this.loadImageCache(PLAYER.hurt);
 
     this.aplyGravity();
     this.animate();
@@ -56,13 +59,19 @@ export class PlayerModel extends EntityModel {
 
     setInterval(() => {
       if (!this.world) return;
-      if (this.isAboveGround()) {
+      if (this.isDead()) {
+        this.playAnimation(PLAYER.death);
+      } else if (this.isHurt()) {
+        this.playAnimation(PLAYER.hurt);
+      } else if (this.isAboveGround()) {
         this.playAnimation(PLAYER.jump);
       } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
         this.playAnimation(PLAYER.walk);
+      } else if (this.world.keyboard.SPACE) {
+        this.playAnimation(PLAYER.attack);
       } else {
         this.playAnimation(['./assets/player/knight.png']);
       }
-    }, 1000 / PLAYER.idle.length);
+    }, 1000 / 10);
   }
 }
