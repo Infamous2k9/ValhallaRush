@@ -11,13 +11,6 @@ export class EntityModel {
     bottom: 0,
     left: 0,
   };
-  //death animation muss angepasst werden
-  deathOffset = {
-    posX: 0,
-    posY: 0,
-    height: 0,
-    witdh: 0,
-  };
 
   image = new Image();
   imageCache: Record<string, HTMLImageElement> = {};

@@ -60,6 +60,8 @@ export class PlayerModel extends EntityModel {
     setInterval(() => {
       if (!this.world) return;
       if (this.isDead()) {
+        //position muss noch angepasst werden
+        this.position_y = 300;
         this.playAnimation(PLAYER.death);
       } else if (this.isHurt()) {
         this.playAnimation(PLAYER.hurt);
