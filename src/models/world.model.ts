@@ -3,6 +3,7 @@ import { Background } from './background.model';
 import type { EndbossModel } from './endboss.model';
 import { EnemyModel } from './enemy.model';
 import type { EntityModel } from './entity.model';
+import { Userinterface } from './gui.model';
 import { Keyboard } from './keyboard.model';
 import { PlayerModel } from './player.model';
 
@@ -15,6 +16,14 @@ export class WorldModel {
   debugMode = true;
 
   level = level1;
+
+  UI = [
+    new Userinterface(15, 10, './assets/gui/ui-bar/bg.png'),
+    new Userinterface(15, 10, './assets/gui/ui-bar/red.png'),
+
+    new Userinterface(15, 40, './assets/gui/ui-bar/bg.png'),
+    new Userinterface(15, 40, './assets/gui/ui-bar/green.png'),
+  ];
 
   constructor(canvas: HTMLCanvasElement, keyboard: Keyboard) {
     this.canvas = canvas;
@@ -35,6 +44,7 @@ export class WorldModel {
           console.log('take dmg: ', this.player.healthPoints);
         }
       });
+
       //Endboss Collision
       if (this.player.isColliding(this.level.endboss)) {
         console.log('colliding with: ', this.level.endboss);
@@ -45,8 +55,7 @@ export class WorldModel {
   setWorld() {
     this.player.world = this;
   }
-  //verstehe noch nicht warum da ne arrow func hin muss irgendwas wegen this????
-  //wurde im video 12.2.10 erklärt aber etwas anders
+
   draw = () => {
     if (!this.ctx) return;
 
@@ -56,6 +65,12 @@ export class WorldModel {
     this.ctx.translate(this.POV_X, 0);
     //load background objects
     this.level.backgroundObjects.forEach((bg) => this.loadBackground(bg));
+
+    //load Userinterface
+    this.UI.forEach((element) => {
+      this.drawInterface(element, -this.POV_X);
+    });
+
     //load enemies
     this.level.enemies.forEach((enemy) => {
       this.drawEnemy(enemy);
@@ -93,6 +108,11 @@ export class WorldModel {
       this.canvas.width,
       this.canvas.height
     );
+  }
+
+  drawInterface(element: Userinterface, x: number) {
+    if (!this.ctx) return;
+    return this.ctx.drawImage(element.image, x + element.position_x, element.position_y, 160, 35);
   }
 
   drawPlayer(obj: PlayerModel) {
