@@ -2,10 +2,17 @@ import { Background } from '../../classes/background.class';
 import { Endboss } from '../../classes/endboss.class';
 import { Enemy } from '../../classes/enemy.class';
 import { Level } from '../../classes/level.class';
+import { Potion } from '../../classes/potion.class';
+import { Rune } from '../../classes/rune.class';
+import type { Collectible } from '../../classes/collectible.class';
 import { HEAVY_GOLEM, SMALL_GOLEM } from '../enemy-types.data';
 
 const BACKGROUND_PATH = './assets/battlegrounds/Battleground1/Bright/';
 const BACKGROUND_WIDTH = 720;
+
+const RUNE_LOW = 385;
+const RUNE_HIGH = 270;
+const POTION_Y = 390;
 
 const BACKGROUND_LAYERS = [
   { file: 'sky.png', y: 0 },
@@ -44,10 +51,10 @@ function createBackgrounds(): Background[] {
 /**
  * Creates a fresh copy of level 1. Call it again for every new game.
  *
- * @returns {Level} A new level with new enemies.
+ * @returns {Level} A new level with new enemies and items.
  */
 export function createLevel1(): Level {
-  return new Level(createEnemies(), new Endboss(1850), createBackgrounds());
+  return new Level(createEnemies(), new Endboss(1850), createBackgrounds(), createCollectibles());
 }
 
 
@@ -64,4 +71,20 @@ function createEnemies(): Enemy[] {
     new Enemy(1150, HEAVY_GOLEM),
     new Enemy(1450, SMALL_GOLEM),
   ];
+}
+
+
+/**
+ * Places runes and potions. Runes on RUNE_HIGH can only be reached by jumping.
+ *
+ * @returns {Collectible[]} Items of level 1.
+ */
+function createCollectibles(): Collectible[] {
+  const runePositions = [
+    [-250, RUNE_LOW], [50, RUNE_HIGH], [300, RUNE_LOW], [650, RUNE_HIGH],
+    [1000, RUNE_LOW], [1300, RUNE_HIGH], [1650, RUNE_LOW], [2050, RUNE_HIGH],
+  ];
+  const runes = runePositions.map(([x, y], index) => new Rune(x, y, index + 1));
+  const potions = [new Potion(700, POTION_Y), new Potion(1550, POTION_Y)];
+  return [...runes, ...potions];
 }

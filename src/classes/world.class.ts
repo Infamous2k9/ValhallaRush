@@ -6,6 +6,7 @@ import type { Keyboard } from './keyboard.class';
 import type { Level } from './level.class';
 import { MovableObject } from './movable-object.class';
 import { Player } from './player.class';
+import { RuneCounter } from './rune-counter.class';
 import { StatusBar } from './status-bar.class';
 
 const RED_FILL = './assets/gui/ui-bar/red.png';
@@ -19,7 +20,7 @@ export class World {
   ctx: CanvasRenderingContext2D;
   level: Level;
   player: Player;
-  statusBars: StatusBar[];
+  hud: DrawableObject[];
   cameraX = 0;
   debugMode = false;
   animationFrameId = 0;
@@ -34,7 +35,7 @@ export class World {
     this.level = createLevel1();
     this.player = new Player(keyboard, this.level.endLevelX);
     this.level.setTarget(this.player);
-    this.statusBars = this.createStatusBars();
+    this.hud = this.createHud();
     setStoppableInterval(() => this.checkCollisions(), 20);
     this.draw();
   }
@@ -53,24 +54,25 @@ export class World {
 
 
   /**
-   * Health and stamina of the player on the left, boss health on the right.
+   * Health, stamina and runes of the player on the left, boss health on the right.
    * The boss bar only shows up once the boss has woken up.
    *
-   * @returns {StatusBar[]} All status bars of the HUD.
+   * @returns {DrawableObject[]} All elements of the HUD.
    */
-  createStatusBars(): StatusBar[] {
+  createHud(): DrawableObject[] {
     const boss = this.level.endboss;
     const bossBarX = this.canvas.width - 175;
     return [
       new StatusBar(15, 10, RED_FILL, () => this.player.getHealthPercentage()),
       new StatusBar(15, 40, GREEN_FILL, () => this.player.getStaminaPercentage()),
+      new RuneCounter(20, 78, () => this.player.runes, this.level.totalRunes),
       new StatusBar(bossBarX, 10, RED_FILL, () => boss.getHealthPercentage(), () => boss.isActivated),
     ];
   }
 
 
   /**
-   * Resolves every fight between the player and the living enemies.
+   * Resolves fights and item pickups.
    *
    * @returns {void}
    */
@@ -80,6 +82,22 @@ export class World {
       this.checkPlayerAttack(enemy);
       this.checkEnemyContact(enemy);
     });
+    this.checkCollectibles();
+  }
+
+
+  /**
+   * Lets the player pick up every item he touches and removes it from the level.
+   *
+   * @returns {void}
+   */
+  checkCollectibles(): void {
+    this.level.collectibles.forEach((item) => {
+      if (item.canBeCollectedBy(this.player) && this.player.isColliding(item)) {
+        item.collect(this.player);
+      }
+    });
+    this.level.removeCollected();
   }
 
 
@@ -117,7 +135,7 @@ export class World {
     this.ctx.translate(this.cameraX, 0);
     this.drawWorldObjects();
     this.ctx.translate(-this.cameraX, 0);
-    this.drawObjects(this.statusBars);
+    this.drawObjects(this.hud);
     this.animationFrameId = requestAnimationFrame(this.draw);
   };
 
@@ -129,6 +147,7 @@ export class World {
    */
   drawWorldObjects(): void {
     this.drawObjects(this.level.backgroundObjects);
+    this.drawObjects(this.level.collectibles);
     this.drawObjects(this.level.enemies);
     this.drawObject(this.level.endboss);
     this.drawObject(this.player);

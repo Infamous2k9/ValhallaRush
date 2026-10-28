@@ -129,6 +129,17 @@ export class Player extends MovableObject {
 
 
   /**
+   * Restores health without going above the maximum.
+   *
+   * @param {number} amount - Health points to restore.
+   * @returns {void}
+   */
+  heal(amount: number): void {
+    this.healthPoints = Math.min(this.maxHealthPoints, this.healthPoints + amount);
+  }
+
+
+  /**
    * Starts a new sword swing if no swing is running and enough stamina is left.
    *
    * @returns {void}
