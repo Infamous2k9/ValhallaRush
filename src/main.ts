@@ -1,51 +1,40 @@
-import { Keyboard } from './models/keyboard.model';
-import { WorldModel } from './models/world.model';
+import { Keyboard } from './classes/keyboard.class';
+import { World } from './classes/world.class';
 import './styles/styles.scss';
-// damit game in den DevTools angezeigt wird!!!
+
+// Expose the running game in the DevTools as `game`
 declare global {
   interface Window {
-    game: WorldModel;
+    game: World;
   }
 }
 
-let appRef = document.querySelector<HTMLCanvasElement>('[data-app]');
-let game: WorldModel;
 const keyboard = new Keyboard();
 
-function init() {
-  if (!appRef) return;
-  game = new WorldModel(appRef, keyboard);
 
-  //devtools
-  window.game = game;
+/**
+ * Binds the input once and starts the first game.
+ *
+ * @returns {void}
+ */
+function init(): void {
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-app]');
+  if (!canvas) return;
+  keyboard.bindEvents();
+  bindDebugToggle();
+  window.game = new World(canvas, keyboard);
 }
 
-// keyboard logic
-window.addEventListener('keydown', (e) => {
-  if (e.key === 'ArrowLeft' || e.key === 'a') {
-    keyboard.LEFT = true;
-  } else if (e.key === 'ArrowRight' || e.key === 'd') {
-    keyboard.RIGHT = true;
-  } else if (e.key === 'ArrowUp' || e.key === 'w') {
-    keyboard.UP = true;
-  } else if (e.key === 'ArrowDown' || e.key === 's') {
-    keyboard.DOWN = true;
-  } else if (e.key === ' ') {
-    keyboard.SPACE = true;
-  }
-});
-window.addEventListener('keyup', (e) => {
-  if (e.key === 'ArrowLeft' || e.key === 'a') {
-    keyboard.LEFT = false;
-  } else if (e.key === 'ArrowRight' || e.key === 'd') {
-    keyboard.RIGHT = false;
-  } else if (e.key === 'ArrowUp' || e.key === 'w') {
-    keyboard.UP = false;
-  } else if (e.key === 'ArrowDown' || e.key === 's') {
-    keyboard.DOWN = false;
-  } else if (e.key === ' ') {
-    keyboard.SPACE = false;
-  }
-});
+
+/**
+ * Toggles the hitbox view with the H key.
+ *
+ * @returns {void}
+ */
+function bindDebugToggle(): void {
+  window.addEventListener('keydown', (event) => {
+    if (event.key.toLowerCase() === 'h') window.game?.toggleDebugMode();
+  });
+}
 
 init();

@@ -1,48 +1,54 @@
-import { Level } from '../../models/level.model';
-import { EnemyModel } from '../../models/enemy.model';
-import { Background } from '../../models/background.model';
-import { EndbossModel } from '../../models/endboss.model';
+import { Background } from '../../classes/background.class';
+import { Endboss } from '../../classes/endboss.class';
+import { Enemy } from '../../classes/enemy.class';
+import { Level } from '../../classes/level.class';
 
-export const level1 = new Level(
-  [new EnemyModel()],
+const BACKGROUND_PATH = './assets/battlegrounds/Battleground1/Bright/';
+const BACKGROUND_WIDTH = 720;
 
-  new EndbossModel(),
+const BACKGROUND_LAYERS = [
+  { file: 'sky.png', y: 0 },
+  { file: 'ruins_bg.png', y: 10 },
+  { file: 'hills&trees.png', y: 70 },
+  { file: 'ruins.png', y: 80 },
+  { file: 'ruins2.png', y: 100 },
+  { file: 'statue.png', y: 140 },
+  { file: 'stones&grass.png', y: 170 },
+];
 
-  [
-    new Background(-720, 0, './assets/battlegrounds/Battleground1/Bright/sky.png'),
-    new Background(-720, 10, './assets/battlegrounds/Battleground1/Bright/ruins_bg.png'),
-    new Background(-720, 70, './assets/battlegrounds/Battleground1/Bright/hills&trees.png'),
-    new Background(-720, 80, './assets/battlegrounds/Battleground1/Bright/ruins.png'),
-    new Background(-720, 100, './assets/battlegrounds/Battleground1/Bright/ruins2.png'),
-    new Background(-720, 140, './assets/battlegrounds/Battleground1/Bright/statue.png'),
-    new Background(-720, 170, './assets/battlegrounds/Battleground1/Bright/stones&grass.png'),
-    new Background(0, 0, './assets/battlegrounds/Battleground1/Bright/sky.png'),
-    new Background(0, 10, './assets/battlegrounds/Battleground1/Bright/ruins_bg.png'),
-    new Background(0, 70, './assets/battlegrounds/Battleground1/Bright/hills&trees.png'),
-    new Background(0, 80, './assets/battlegrounds/Battleground1/Bright/ruins.png'),
-    new Background(0, 100, './assets/battlegrounds/Battleground1/Bright/ruins2.png'),
-    new Background(0, 140, './assets/battlegrounds/Battleground1/Bright/statue.png'),
-    new Background(0, 170, './assets/battlegrounds/Battleground1/Bright/stones&grass.png'),
-    new Background(720, 0, './assets/battlegrounds/Battleground1/Bright/sky.png'),
-    new Background(720, 10, './assets/battlegrounds/Battleground1/Bright/ruins_bg.png'),
-    new Background(720, 70, './assets/battlegrounds/Battleground1/Bright/hills&trees.png'),
-    new Background(720, 80, './assets/battlegrounds/Battleground1/Bright/ruins.png'),
-    new Background(720, 100, './assets/battlegrounds/Battleground1/Bright/ruins2.png'),
-    new Background(720, 140, './assets/battlegrounds/Battleground1/Bright/statue.png'),
-    new Background(720, 170, './assets/battlegrounds/Battleground1/Bright/stones&grass.png'),
-    new Background(720 * 2, 0, './assets/battlegrounds/Battleground1/Bright/sky.png'),
-    new Background(720 * 2, 10, './assets/battlegrounds/Battleground1/Bright/ruins_bg.png'),
-    new Background(720 * 2, 70, './assets/battlegrounds/Battleground1/Bright/hills&trees.png'),
-    new Background(720 * 2, 80, './assets/battlegrounds/Battleground1/Bright/ruins.png'),
-    new Background(720 * 2, 100, './assets/battlegrounds/Battleground1/Bright/ruins2.png'),
-    new Background(720 * 2, 140, './assets/battlegrounds/Battleground1/Bright/statue.png'),
-    new Background(720 * 2, 170, './assets/battlegrounds/Battleground1/Bright/stones&grass.png'),
-    new Background(720 * 3, 0, './assets/battlegrounds/Battleground1/Bright/sky.png'),
-    new Background(720 * 3, 10, './assets/battlegrounds/Battleground1/Bright/ruins_bg.png'),
-    new Background(720 * 3, 70, './assets/battlegrounds/Battleground1/Bright/hills&trees.png'),
-    new Background(720 * 3, 80, './assets/battlegrounds/Battleground1/Bright/ruins.png'),
-    new Background(720 * 3, 100, './assets/battlegrounds/Battleground1/Bright/ruins2.png'),
-    new Background(720 * 3, 140, './assets/battlegrounds/Battleground1/Bright/statue.png'),
-    new Background(720 * 3, 170, './assets/battlegrounds/Battleground1/Bright/stones&grass.png'),
-  ]
-);
+
+/**
+ * Builds all background layers for one screen-wide segment.
+ *
+ * @param {number} segment - Index of the segment (-1 is left of the start).
+ * @returns {Background[]} Background layers of this segment.
+ */
+function createBackgroundSegment(segment: number): Background[] {
+  const x = segment * BACKGROUND_WIDTH;
+  return BACKGROUND_LAYERS.map((layer) => new Background(x, layer.y, BACKGROUND_PATH + layer.file));
+}
+
+
+/**
+ * Builds the background from segment -1 to segment 3.
+ *
+ * @returns {Background[]} All background layers of the level.
+ */
+function createBackgrounds(): Background[] {
+  const segments = [-1, 0, 1, 2, 3];
+  return segments.flatMap((segment) => createBackgroundSegment(segment));
+}
+
+
+/**
+ * Creates a fresh copy of level 1. Call it again for every new game.
+ *
+ * @returns {Level} A new level with new enemies.
+ */
+export function createLevel1(): Level {
+  return new Level(
+    [new Enemy(20 + Math.random() * 100)],
+    new Endboss(1850),
+    createBackgrounds()
+  );
+}
