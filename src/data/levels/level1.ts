@@ -2,6 +2,7 @@ import { Background } from '../../classes/background.class';
 import { Endboss } from '../../classes/endboss.class';
 import { Enemy } from '../../classes/enemy.class';
 import { Level } from '../../classes/level.class';
+import { HEAVY_GOLEM, SMALL_GOLEM } from '../enemy-types.data';
 
 const BACKGROUND_PATH = './assets/battlegrounds/Battleground1/Bright/';
 const BACKGROUND_WIDTH = 720;
@@ -46,9 +47,21 @@ function createBackgrounds(): Background[] {
  * @returns {Level} A new level with new enemies.
  */
 export function createLevel1(): Level {
-  return new Level(
-    [new Enemy(20 + Math.random() * 100)],
-    new Endboss(1850),
-    createBackgrounds()
-  );
+  return new Level(createEnemies(), new Endboss(1850), createBackgrounds());
+}
+
+
+/**
+ * Places the normal enemies. The first one is far enough away
+ * so the player is not attacked right at the start.
+ *
+ * @returns {Enemy[]} Enemies of level 1.
+ */
+function createEnemies(): Enemy[] {
+  return [
+    new Enemy(400, SMALL_GOLEM),
+    new Enemy(850, SMALL_GOLEM),
+    new Enemy(1150, HEAVY_GOLEM),
+    new Enemy(1450, SMALL_GOLEM),
+  ];
 }

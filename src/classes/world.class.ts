@@ -1,6 +1,7 @@
 import { createLevel1 } from '../data/levels/level1';
 import { setStoppableInterval, stopAllIntervals } from '../utils/intervals';
 import type { DrawableObject } from './drawable-object.class';
+import type { Enemy } from './enemy.class';
 import type { Keyboard } from './keyboard.class';
 import type { Level } from './level.class';
 import { MovableObject } from './movable-object.class';
@@ -29,6 +30,7 @@ export class World {
     this.ctx = this.getContext(canvas);
     this.level = createLevel1();
     this.player = new Player(keyboard, this.level.endLevelX);
+    this.level.setTarget(this.player);
     this.uiElements = this.createUiElements();
     setStoppableInterval(() => this.checkCollisions(), 20);
     this.draw();
@@ -61,16 +63,39 @@ export class World {
 
 
   /**
-   * Lets enemies damage the player. A short invulnerability follows each hit.
+   * Resolves every fight between the player and the living enemies.
    *
    * @returns {void}
    */
   checkCollisions(): void {
-    this.level.enemies.forEach((enemy) => {
-      if (this.player.isColliding(enemy) && !this.player.isHurt()) {
-        this.player.takeDamage(enemy.damage);
-      }
+    this.level.getAllEnemies().forEach((enemy) => {
+      if (enemy.isDead()) return;
+      this.checkPlayerAttack(enemy);
+      this.checkEnemyContact(enemy);
     });
+  }
+
+
+  /**
+   * Damages the enemy if the current sword swing reaches it.
+   *
+   * @param {Enemy} enemy - Enemy to test.
+   * @returns {void}
+   */
+  checkPlayerAttack(enemy: Enemy): void {
+    if (this.player.canHit(enemy)) this.player.hit(enemy);
+  }
+
+
+  /**
+   * Damages the player on contact. A short invulnerability follows each hit.
+   *
+   * @param {Enemy} enemy - Enemy to test.
+   * @returns {void}
+   */
+  checkEnemyContact(enemy: Enemy): void {
+    if (this.player.isDead() || this.player.isHurt()) return;
+    if (this.player.isColliding(enemy)) this.player.takeDamage(enemy.damage);
   }
 
 

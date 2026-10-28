@@ -1,35 +1,107 @@
-import { GOLEM_1 } from '../data/golem_1.data';
+import type { EnemyAnimations, EnemyConfig } from '../interfaces/enemy-config.interface';
 import { setStoppableInterval } from '../utils/intervals';
 import { MovableObject } from './movable-object.class';
 
 /**
- * Normal golem enemy.
+ * Golem enemy. Waits until the target comes close, then walks toward it and attacks.
  */
 export class Enemy extends MovableObject {
-  damage = 5;
+  animations: EnemyAnimations;
+  idleFrames: string[];
+  damage = 0;
+  activationRange = 0;
+  isActivated = false;
+  target: MovableObject | null = null;
 
   /**
    * @param {number} x - Horizontal start position.
+   * @param {EnemyConfig} config - Stats and animations of the enemy type.
    */
-  constructor(x: number) {
-    super(x, 320, './assets/enemys/golem_1/Idle/0_Golem_Idle_000.png');
+  constructor(x: number, config: EnemyConfig) {
+    super(x, config.y, config.animations.walking[0]);
+    this.animations = config.animations;
+    this.idleFrames = [config.animations.walking[0]];
     this.otherDirection = true;
-    this.speed = 0.5 + Math.random() * 1.5;
-    this.offsets = { top: 30, right: 30, bottom: 20, left: 30 };
-    this.loadImageCache(GOLEM_1.walking);
-    this.loadImageCache(GOLEM_1.hurt);
-    this.loadImageCache(GOLEM_1.dying);
+    this.applyConfig(config);
+    this.loadAnimations();
     this.animate();
   }
 
 
   /**
-   * Starts the animation loop.
+   * Copies size and stats from the enemy type.
+   *
+   * @param {EnemyConfig} config - Stats of the enemy type.
+   * @returns {void}
+   */
+  applyConfig(config: EnemyConfig): void {
+    this.width = config.width;
+    this.height = config.height;
+    this.healthPoints = config.healthPoints;
+    this.damage = config.damage;
+    this.speed = config.speed;
+    this.activationRange = config.activationRange;
+    this.offsets = { ...config.offsets };
+  }
+
+
+  /**
+   * Preloads every animation of this enemy type.
+   *
+   * @returns {void}
+   */
+  loadAnimations(): void {
+    Object.values(this.animations).forEach((frames) => {
+      if (frames) this.loadImageCache(frames);
+    });
+  }
+
+
+  /**
+   * Starts the movement loop and the animation loop.
    *
    * @returns {void}
    */
   animate(): void {
+    setStoppableInterval(() => this.updateMovement(), 1000 / 25);
     setStoppableInterval(() => this.updateAnimation(), 1000 / 25);
+  }
+
+
+  /**
+   * Wakes up when the target is close, then follows it until they touch.
+   *
+   * @returns {void}
+   */
+  updateMovement(): void {
+    if (this.isDead() || !this.target || this.target.isDead()) return;
+    if (!this.isActivated) this.isActivated = this.isTargetInRange();
+    if (this.isActivated && !this.isColliding(this.target)) this.moveTowardTarget();
+  }
+
+
+  /**
+   * @returns {boolean} True if the target is within the activation range.
+   */
+  isTargetInRange(): boolean {
+    if (!this.target) return false;
+    return Math.abs(this.target.getCenterX() - this.getCenterX()) < this.activationRange;
+  }
+
+
+  /**
+   * Turns toward the target and takes one step.
+   *
+   * @returns {void}
+   */
+  moveTowardTarget(): void {
+    if (!this.target) return;
+    this.otherDirection = this.target.getCenterX() < this.getCenterX();
+    if (this.otherDirection) {
+      this.moveLeft();
+    } else {
+      this.moveRight();
+    }
   }
 
 
@@ -40,11 +112,15 @@ export class Enemy extends MovableObject {
    */
   updateAnimation(): void {
     if (this.isDead()) {
-      this.playAnimation(GOLEM_1.dying);
-    } else if (this.isHurt()) {
-      this.playAnimation(GOLEM_1.hurt);
+      this.playAnimationOnce(this.animations.dying);
+    } else if (this.isHurt() && this.animations.hurt) {
+      this.playAnimation(this.animations.hurt);
+    } else if (this.target && this.isColliding(this.target)) {
+      this.playAnimation(this.animations.attack);
+    } else if (this.isActivated) {
+      this.playAnimation(this.animations.walking);
     } else {
-      this.playAnimation(GOLEM_1.walking);
+      this.playAnimation(this.idleFrames);
     }
   }
 }

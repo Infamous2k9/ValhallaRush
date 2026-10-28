@@ -1,9 +1,13 @@
 import { PLAYER } from '../data/player.data';
+import type { Hitbox } from '../interfaces/hitbox.interface';
+import { hitboxesOverlap } from '../utils/collision';
 import { setStoppableInterval } from '../utils/intervals';
 import type { Keyboard } from './keyboard.class';
 import { MovableObject } from './movable-object.class';
 
 const START_X = -500;
+const ATTACK_DURATION = 400;
+const ATTACK_RANGE = 70;
 
 /**
  * The knight controlled by the player.
@@ -14,6 +18,8 @@ export class Player extends MovableObject {
   damage = 20;
   keyboard: Keyboard;
   maxX: number;
+  lastAttack = 0;
+  hitTargets = new Set<MovableObject>();
 
   /**
    * @param {Keyboard} keyboard - Shared keyboard state.
@@ -50,18 +56,30 @@ export class Player extends MovableObject {
    * @returns {void}
    */
   animate(): void {
-    setStoppableInterval(() => this.handleMovement(), 1000 / 25);
+    setStoppableInterval(() => this.handleInput(), 1000 / 25);
     setStoppableInterval(() => this.updateAnimation(), 1000 / 10);
   }
 
 
   /**
-   * Moves and jumps according to the pressed keys.
+   * Reacts to the pressed keys. A dead knight ignores all input.
    *
    * @returns {void}
    */
-  handleMovement(): void {
+  handleInput(): void {
     if (this.isDead()) return;
+    this.handleWalking();
+    if (this.keyboard.up && !this.isAboveGround()) this.jump();
+    if (this.keyboard.space) this.startAttack();
+  }
+
+
+  /**
+   * Walks left or right inside the level borders.
+   *
+   * @returns {void}
+   */
+  handleWalking(): void {
     if (this.keyboard.right && this.x < this.maxX) {
       this.moveRight();
       this.otherDirection = false;
@@ -70,7 +88,62 @@ export class Player extends MovableObject {
       this.moveLeft();
       this.otherDirection = true;
     }
-    if (this.keyboard.up && !this.isAboveGround()) this.jump();
+  }
+
+
+  /**
+   * Starts a new sword swing unless one is still running.
+   *
+   * @returns {void}
+   */
+  startAttack(): void {
+    if (this.isAttacking()) return;
+    this.lastAttack = Date.now();
+    this.hitTargets.clear();
+  }
+
+
+  /**
+   * @returns {boolean} True while a sword swing is running.
+   */
+  isAttacking(): boolean {
+    return Date.now() - this.lastAttack < ATTACK_DURATION;
+  }
+
+
+  /**
+   * Area in front of the knight that the sword reaches.
+   *
+   * @returns {Hitbox} Absolute edges of the sword area.
+   */
+  getAttackHitbox(): Hitbox {
+    const body = this.getHitbox();
+    const left = this.otherDirection ? body.left - ATTACK_RANGE : body.right;
+    return { left, right: left + ATTACK_RANGE, top: body.top, bottom: body.bottom };
+  }
+
+
+  /**
+   * A target can be hit once per swing and only if the sword reaches it.
+   *
+   * @param {MovableObject} target - Object to test.
+   * @returns {boolean} True if the current swing hits the target.
+   */
+  canHit(target: MovableObject): boolean {
+    if (!this.isAttacking() || this.hitTargets.has(target)) return false;
+    return hitboxesOverlap(this.getAttackHitbox(), target.getHitbox());
+  }
+
+
+  /**
+   * Damages a target and remembers it for the current swing.
+   *
+   * @param {MovableObject} target - Object that was hit.
+   * @returns {void}
+   */
+  hit(target: MovableObject): void {
+    target.takeDamage(this.damage);
+    this.hitTargets.add(target);
   }
 
 
@@ -81,17 +154,29 @@ export class Player extends MovableObject {
    */
   updateAnimation(): void {
     if (this.isDead()) {
-      this.playAnimation(PLAYER.death);
+      this.playAnimationOnce(PLAYER.death);
     } else if (this.isHurt()) {
       this.playAnimation(PLAYER.hurt);
+    } else if (this.isAttacking()) {
+      this.playAnimationOnce(PLAYER.attack);
     } else if (this.isAboveGround()) {
       this.playAnimation(PLAYER.jump);
     } else if (this.keyboard.right || this.keyboard.left) {
       this.playAnimation(PLAYER.walk);
-    } else if (this.keyboard.space) {
-      this.playAnimation(PLAYER.attack);
     } else {
       this.playAnimation(PLAYER.idle);
     }
+  }
+
+
+  /**
+   * Adds the sword area (yellow) to the debug view while attacking.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas context to draw on.
+   * @returns {void}
+   */
+  drawDebugFrames(ctx: CanvasRenderingContext2D): void {
+    super.drawDebugFrames(ctx);
+    if (this.isAttacking()) this.strokeHitbox(ctx, this.getAttackHitbox(), 'yellow');
   }
 }
