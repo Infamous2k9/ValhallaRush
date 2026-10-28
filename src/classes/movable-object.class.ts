@@ -13,6 +13,7 @@ export class MovableObject extends DrawableObject {
   acceleration = 2;
   groundY = 0;
   healthPoints = 100;
+  maxHealthPoints = 100;
   lastHit = 0;
   currentImage = 0;
   currentAnimation: string[] = [];
@@ -138,6 +139,14 @@ export class MovableObject extends DrawableObject {
   isHurt(): boolean {
     const secondsSinceHit = (Date.now() - this.lastHit) / 1000;
     return secondsSinceHit < 0.8;
+  }
+
+
+  /**
+   * @returns {number} Remaining health between 0 and 1.
+   */
+  getHealthPercentage(): number {
+    return this.healthPoints / this.maxHealthPoints;
   }
 
 

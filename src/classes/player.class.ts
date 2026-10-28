@@ -8,17 +8,24 @@ import { MovableObject } from './movable-object.class';
 const START_X = -500;
 const ATTACK_DURATION = 400;
 const ATTACK_RANGE = 70;
+const ATTACK_COST = 25;
+const STAMINA_REGENERATION = 0.5;
+const SLEEP_DELAY = 10000;
+const SLEEP_FRAMES = PLAYER.idle.flatMap((frame) => [frame, frame, frame]);
+const PLAY_ONCE = [PLAYER.death, PLAYER.attack];
 
 /**
  * The knight controlled by the player.
  */
 export class Player extends MovableObject {
   runes = 0;
-  stamina = 120;
+  stamina = 100;
+  maxStamina = 100;
   damage = 20;
   keyboard: Keyboard;
   maxX: number;
   lastAttack = 0;
+  lastInput = Date.now();
   hitTargets = new Set<MovableObject>();
 
   /**
@@ -51,7 +58,7 @@ export class Player extends MovableObject {
 
 
   /**
-   * Starts the movement loop and the animation loop.
+   * Starts the input loop and the animation loop.
    *
    * @returns {void}
    */
@@ -68,9 +75,20 @@ export class Player extends MovableObject {
    */
   handleInput(): void {
     if (this.isDead()) return;
+    if (this.hasInput()) this.lastInput = Date.now();
     this.handleWalking();
     if (this.keyboard.up && !this.isAboveGround()) this.jump();
     if (this.keyboard.space) this.startAttack();
+    this.regenerateStamina();
+  }
+
+
+  /**
+   * @returns {boolean} True if any game key is pressed.
+   */
+  hasInput(): boolean {
+    const { left, right, up, down, space } = this.keyboard;
+    return left || right || up || down || space;
   }
 
 
@@ -92,12 +110,32 @@ export class Player extends MovableObject {
 
 
   /**
-   * Starts a new sword swing unless one is still running.
+   * Refills stamina a little on every tick while not attacking.
+   *
+   * @returns {void}
+   */
+  regenerateStamina(): void {
+    if (this.isAttacking()) return;
+    this.stamina = Math.min(this.maxStamina, this.stamina + STAMINA_REGENERATION);
+  }
+
+
+  /**
+   * @returns {number} Remaining stamina between 0 and 1.
+   */
+  getStaminaPercentage(): number {
+    return this.stamina / this.maxStamina;
+  }
+
+
+  /**
+   * Starts a new sword swing if no swing is running and enough stamina is left.
    *
    * @returns {void}
    */
   startAttack(): void {
-    if (this.isAttacking()) return;
+    if (this.isAttacking() || this.stamina < ATTACK_COST) return;
+    this.stamina -= ATTACK_COST;
     this.lastAttack = Date.now();
     this.hitTargets.clear();
   }
@@ -148,24 +186,66 @@ export class Player extends MovableObject {
 
 
   /**
-   * Picks the animation that matches the current state.
+   * @returns {boolean} True if the knight has been idle for too long.
+   */
+  isSleeping(): boolean {
+    return !this.isDead() && Date.now() - this.lastInput > SLEEP_DELAY;
+  }
+
+
+  /**
+   * Plays the animation of the current state. Death and attack do not loop.
    *
    * @returns {void}
    */
   updateAnimation(): void {
-    if (this.isDead()) {
-      this.playAnimationOnce(PLAYER.death);
-    } else if (this.isHurt()) {
-      this.playAnimation(PLAYER.hurt);
-    } else if (this.isAttacking()) {
-      this.playAnimationOnce(PLAYER.attack);
-    } else if (this.isAboveGround()) {
-      this.playAnimation(PLAYER.jump);
-    } else if (this.keyboard.right || this.keyboard.left) {
-      this.playAnimation(PLAYER.walk);
+    const frames = this.getCurrentFrames();
+    if (PLAY_ONCE.includes(frames)) {
+      this.playAnimationOnce(frames);
     } else {
-      this.playAnimation(PLAYER.idle);
+      this.playAnimation(frames);
     }
+  }
+
+
+  /**
+   * @returns {string[]} Frames of the state with the highest priority.
+   */
+  getCurrentFrames(): string[] {
+    if (this.isDead()) return PLAYER.death;
+    if (this.isHurt()) return PLAYER.hurt;
+    if (this.isAttacking()) return PLAYER.attack;
+    if (this.isAboveGround()) return PLAYER.jump;
+    if (this.keyboard.right || this.keyboard.left) return PLAYER.walk;
+    if (this.isSleeping()) return SLEEP_FRAMES;
+    return PLAYER.idle;
+  }
+
+
+  /**
+   * Draws the knight and a floating "Zzz" while he sleeps.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas context to draw on.
+   * @returns {void}
+   */
+  draw(ctx: CanvasRenderingContext2D): void {
+    super.draw(ctx);
+    if (this.isSleeping()) this.drawSleepIndicator(ctx);
+  }
+
+
+  /**
+   * Draws a "Zzz" that slowly rises above the head and starts again.
+   *
+   * @param {CanvasRenderingContext2D} ctx - Canvas context to draw on.
+   * @returns {void}
+   */
+  drawSleepIndicator(ctx: CanvasRenderingContext2D): void {
+    const rise = (Date.now() / 60) % 25;
+    ctx.font = 'bold 22px serif';
+    ctx.fillStyle = 'white';
+    ctx.textAlign = 'center';
+    ctx.fillText('Zzz', this.getCenterX(), this.y + 70 - rise);
   }
 
 

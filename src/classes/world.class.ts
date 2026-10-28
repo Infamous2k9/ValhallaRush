@@ -6,7 +6,10 @@ import type { Keyboard } from './keyboard.class';
 import type { Level } from './level.class';
 import { MovableObject } from './movable-object.class';
 import { Player } from './player.class';
-import { UiElement } from './ui-element.class';
+import { StatusBar } from './status-bar.class';
+
+const RED_FILL = './assets/gui/ui-bar/red.png';
+const GREEN_FILL = './assets/gui/ui-bar/green.png';
 
 /**
  * Runs one game session: owns the level, the player, the camera and the draw loop.
@@ -16,7 +19,7 @@ export class World {
   ctx: CanvasRenderingContext2D;
   level: Level;
   player: Player;
-  uiElements: UiElement[];
+  statusBars: StatusBar[];
   cameraX = 0;
   debugMode = false;
   animationFrameId = 0;
@@ -31,7 +34,7 @@ export class World {
     this.level = createLevel1();
     this.player = new Player(keyboard, this.level.endLevelX);
     this.level.setTarget(this.player);
-    this.uiElements = this.createUiElements();
+    this.statusBars = this.createStatusBars();
     setStoppableInterval(() => this.checkCollisions(), 20);
     this.draw();
   }
@@ -50,14 +53,18 @@ export class World {
 
 
   /**
-   * @returns {UiElement[]} Frames and fills of the status bars.
+   * Health and stamina of the player on the left, boss health on the right.
+   * The boss bar only shows up once the boss has woken up.
+   *
+   * @returns {StatusBar[]} All status bars of the HUD.
    */
-  createUiElements(): UiElement[] {
+  createStatusBars(): StatusBar[] {
+    const boss = this.level.endboss;
+    const bossBarX = this.canvas.width - 175;
     return [
-      new UiElement(15, 10, './assets/gui/ui-bar/bg.png'),
-      new UiElement(15, 10, './assets/gui/ui-bar/red.png'),
-      new UiElement(15, 40, './assets/gui/ui-bar/bg.png'),
-      new UiElement(15, 40, './assets/gui/ui-bar/green.png'),
+      new StatusBar(15, 10, RED_FILL, () => this.player.getHealthPercentage()),
+      new StatusBar(15, 40, GREEN_FILL, () => this.player.getStaminaPercentage()),
+      new StatusBar(bossBarX, 10, RED_FILL, () => boss.getHealthPercentage(), () => boss.isActivated),
     ];
   }
 
@@ -110,7 +117,7 @@ export class World {
     this.ctx.translate(this.cameraX, 0);
     this.drawWorldObjects();
     this.ctx.translate(-this.cameraX, 0);
-    this.drawObjects(this.uiElements);
+    this.drawObjects(this.statusBars);
     this.animationFrameId = requestAnimationFrame(this.draw);
   };
 

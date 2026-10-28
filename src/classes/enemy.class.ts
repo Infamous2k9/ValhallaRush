@@ -38,6 +38,7 @@ export class Enemy extends MovableObject {
     this.width = config.width;
     this.height = config.height;
     this.healthPoints = config.healthPoints;
+    this.maxHealthPoints = config.healthPoints;
     this.damage = config.damage;
     this.speed = config.speed;
     this.activationRange = config.activationRange;
