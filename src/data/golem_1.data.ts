@@ -58,4 +58,18 @@ export const GOLEM_1 = {
     './assets/enemys/golem_1/Slashing/0_Golem_Slashing_010.png',
     './assets/enemys/golem_1/Slashing/0_Golem_Slashing_011.png',
   ],
+  hurt: [
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_000.png',
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_001.png',
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_002.png',
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_003.png',
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_004.png',
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_005.png',
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_006.png',
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_007.png',
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_008.png',
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_009.png',
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_010.png',
+    './assets/enemys/golem_1/Hurt/0_Golem_Hurt_011.png',
+  ],
 };

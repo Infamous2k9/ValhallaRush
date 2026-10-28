@@ -6,9 +6,10 @@ export class PlayerModel extends EntityModel {
   healthPoints = 100;
   runes = 0;
   stamina = 120;
-  attack = 20;
+  damage = 20;
 
   isOnGround = true;
+  isAttacking = false;
 
   world: WorldModel | null = null;
 
@@ -20,7 +21,7 @@ export class PlayerModel extends EntityModel {
     this.width = 175;
 
     this.offsets.bottom = 25;
-    this.offsets.right = 85;
+    this.offsets.right = 20;
     this.offsets.left = 40;
     this.offsets.top = 80;
 
@@ -70,7 +71,13 @@ export class PlayerModel extends EntityModel {
       } else if (this.world.keyboard.RIGHT || this.world.keyboard.LEFT) {
         this.playAnimation(PLAYER.walk);
       } else if (this.world.keyboard.SPACE) {
+        this.isAttacking = true;
+        this.offsets.right = 0;
         this.playAnimation(PLAYER.attack);
+        setTimeout(() => {
+          this.offsets.right = 100;
+          this.isAttacking = false;
+        }, 20);
       } else {
         this.playAnimation(['./assets/player/knight.png']);
       }

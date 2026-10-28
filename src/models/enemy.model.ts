@@ -26,5 +26,15 @@ export class EnemyModel extends EntityModel {
       this.playAnimation(GOLEM_1.walking);
       //this.moveLeft();
     }, 1000 / 25);
+
+    setInterval(() => {
+      if (this.isDead()) {
+        //position muss noch angepasst werden
+        this.position_y = 300;
+        this.playAnimation(GOLEM_1.dying);
+      } else if (this.isHurt()) {
+        this.playAnimation(GOLEM_1.hurt);
+      }
+    }, 1000 / 10);
   }
 }

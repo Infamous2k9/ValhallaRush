@@ -39,7 +39,7 @@ export class WorldModel {
     setInterval(() => {
       //Enemies Collision
       this.level.enemies.forEach((enemy) => {
-        if (this.player.isColliding(enemy)) {
+        if (this.player.isColliding(enemy) && this.player.isAttacking === false) {
           this.player.takeDamage(enemy.attack);
           console.log('take dmg: ', this.player.healthPoints);
         }
@@ -49,7 +49,7 @@ export class WorldModel {
       if (this.player.isColliding(this.level.endboss)) {
         console.log('colliding with: ', this.level.endboss);
       }
-    }, 200);
+    }, 20);
   }
 
   setWorld() {
