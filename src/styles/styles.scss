@@ -1,4 +1,5 @@
 @use './base/' as *;
+@use './components/' as *;
 
 body {
   display: flex;
@@ -7,5 +8,10 @@ body {
 }
 
 canvas {
+  display: block;
   background-color: black;
+}
+
+.d-none {
+  display: none !important;
 }

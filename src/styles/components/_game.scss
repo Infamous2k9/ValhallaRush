@@ -1,0 +1,6 @@
+// Wrapper that lets the screens lie exactly on top of the canvas
+.game {
+  position: relative;
+  width: 720px;
+  height: 480px;
+}

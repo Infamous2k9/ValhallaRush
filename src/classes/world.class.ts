@@ -11,6 +11,9 @@ import { StatusBar } from './status-bar.class';
 
 const RED_FILL = './assets/gui/ui-bar/red.png';
 const GREEN_FILL = './assets/gui/ui-bar/green.png';
+const END_DELAY = 1500;
+
+export type GameResult = 'won' | 'lost';
 
 /**
  * Runs one game session: owns the level, the player, the camera and the draw loop.
@@ -24,19 +27,24 @@ export class World {
   cameraX = 0;
   debugMode = false;
   animationFrameId = 0;
+  isOver = false;
+  onGameEnd: (result: GameResult) => void;
 
   /**
    * @param {HTMLCanvasElement} canvas - Canvas to draw on.
    * @param {Keyboard} keyboard - Shared keyboard state.
+   * @param {(result: GameResult) => void} onGameEnd - Called once when the game is won or lost.
    */
-  constructor(canvas: HTMLCanvasElement, keyboard: Keyboard) {
+  constructor(canvas: HTMLCanvasElement, keyboard: Keyboard, onGameEnd: (result: GameResult) => void) {
     this.canvas = canvas;
+    this.onGameEnd = onGameEnd;
     this.ctx = this.getContext(canvas);
     this.level = createLevel1();
     this.player = new Player(keyboard, this.level.endLevelX);
     this.level.setTarget(this.player);
     this.hud = this.createHud();
     setStoppableInterval(() => this.checkCollisions(), 20);
+    setStoppableInterval(() => this.checkGameEnd(), 100);
     this.draw();
   }
 
@@ -174,6 +182,36 @@ export class World {
     if (this.debugMode && object instanceof MovableObject) {
       object.drawDebugFrames(this.ctx);
     }
+  }
+
+
+  /**
+   * Ends the game when the player or the boss has died.
+   *
+   * @returns {void}
+   */
+  checkGameEnd(): void {
+    if (this.isOver) return;
+    if (this.player.isDead()) {
+      this.finish('lost');
+    } else if (this.level.endboss.isDead()) {
+      this.finish('won');
+    }
+  }
+
+
+  /**
+   * Lets the death animation play, then freezes the game and reports the result.
+   *
+   * @param {GameResult} result - Whether the player won or lost.
+   * @returns {void}
+   */
+  finish(result: GameResult): void {
+    this.isOver = true;
+    setTimeout(() => {
+      this.stop();
+      this.onGameEnd(result);
+    }, END_DELAY);
   }
 
 

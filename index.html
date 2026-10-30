@@ -12,7 +12,28 @@
   </head>
   <body>
     <h1>Valhalla Rush</h1>
-    <canvas data-app width="720" height="480"></canvas>
+
+    <main class="game">
+      <canvas data-app width="720" height="480"></canvas>
+
+      <section class="screen" id="startScreen">
+        <h2 class="screen__title">Valhalla Rush</h2>
+        <p class="screen__text">Defeat the golem king and collect the runes.</p>
+        <div class="screen__actions">
+          <button class="btn" id="startButton" type="button">Start</button>
+        </div>
+      </section>
+
+      <section class="screen d-none" id="endScreen">
+        <h2 class="screen__title" id="endTitle"></h2>
+        <p class="screen__text" id="endStats"></p>
+        <div class="screen__actions">
+          <button class="btn" id="restartButton" type="button">Restart</button>
+          <button class="btn btn--secondary" id="homeButton" type="button">Home</button>
+        </div>
+      </section>
+    </main>
+
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

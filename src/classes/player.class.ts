@@ -7,7 +7,7 @@ import { MovableObject } from './movable-object.class';
 
 const START_X = -500;
 const ATTACK_DURATION = 400;
-const ATTACK_RANGE = 70;
+const ATTACK_RANGE = 95;
 const ATTACK_COST = 25;
 const STAMINA_REGENERATION = 0.5;
 const SLEEP_DELAY = 10000;
@@ -40,7 +40,7 @@ export class Player extends MovableObject {
     this.speed = 6;
     this.width = 175;
     this.height = 175;
-    this.offsets = { top: 80, right: 20, bottom: 25, left: 40 };
+    this.offsets = { top: 80, right: 95, bottom: 25, left: 40 };
     this.loadAllImages();
     this.applyGravity();
     this.animate();

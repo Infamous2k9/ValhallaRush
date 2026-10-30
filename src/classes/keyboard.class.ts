@@ -29,20 +29,37 @@ export class Keyboard {
    * @returns {void}
    */
   bindEvents(): void {
-    window.addEventListener('keydown', (event) => this.setKey(event.key, true));
-    window.addEventListener('keyup', (event) => this.setKey(event.key, false));
+    window.addEventListener('keydown', (event) => this.handleKey(event, true));
+    window.addEventListener('keyup', (event) => this.handleKey(event, false));
   }
 
 
   /**
-   * Updates the state of the action that belongs to a key.
+   * Updates the action that belongs to a key. Game keys do not scroll the page,
+   * but a focused button still reacts to space and enter.
    *
-   * @param {string} key - Value of KeyboardEvent.key.
+   * @param {KeyboardEvent} event - Keyboard event from the browser.
    * @param {boolean} isPressed - New state of the action.
    * @returns {void}
    */
-  setKey(key: string, isPressed: boolean): void {
-    const action = KEY_MAP[key];
-    if (action) this[action] = isPressed;
+  handleKey(event: KeyboardEvent, isPressed: boolean): void {
+    const action = KEY_MAP[event.key];
+    if (!action) return;
+    if (!(event.target instanceof HTMLButtonElement)) event.preventDefault();
+    this[action] = isPressed;
+  }
+
+
+  /**
+   * Releases all keys, e.g. before a new game starts.
+   *
+   * @returns {void}
+   */
+  reset(): void {
+    this.left = false;
+    this.right = false;
+    this.up = false;
+    this.down = false;
+    this.space = false;
   }
 }
