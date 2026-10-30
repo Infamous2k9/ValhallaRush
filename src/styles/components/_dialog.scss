@@ -1,0 +1,67 @@
+@use '../variables' as *;
+
+// The <dialog> itself has no padding, so a click on it means "outside the content"
+.dialog {
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  margin: auto;
+  padding: 0;
+  border: 2px solid $color-gold;
+  border-radius: 12px;
+  background-color: $color-panel;
+  color: $color-text;
+
+  &::backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.dialog__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 32px;
+}
+
+.dialog__close {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 28px;
+  line-height: 1;
+  color: $color-gold;
+  cursor: pointer;
+
+  &:hover {
+    color: $color-text;
+  }
+}
+
+.dialog__title {
+  font-size: 28px;
+  font-weight: 700;
+  color: $color-gold;
+}
+
+.dialog__subtitle {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.key {
+  display: inline-block;
+  min-width: 32px;
+  padding: 2px 8px;
+  border: 1px solid $color-gold;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 14px;
+}

@@ -1,0 +1,32 @@
+@use '../variables' as *;
+
+.imprint {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: min(720px, calc(100% - 32px));
+  padding: 32px;
+  border: 2px solid $color-gold;
+  border-radius: 12px;
+  background-color: $color-panel;
+
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: $color-gold;
+  }
+
+  a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  li {
+    margin-bottom: 6px;
+  }
+
+  .btn {
+    align-self: center;
+    text-decoration: none;
+  }
+}

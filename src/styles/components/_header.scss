@@ -1,0 +1,14 @@
+@use '../variables' as *;
+
+.header {
+  padding-top: 24px;
+  text-align: center;
+}
+
+.header__title {
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: $color-gold;
+  text-shadow: 0 3px 8px rgba(0, 0, 0, 0.8);
+}

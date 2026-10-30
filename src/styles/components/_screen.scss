@@ -1,3 +1,5 @@
+@use '../variables' as *;
+
 // Overlay for start and end screen, covers the whole canvas
 .screen {
   position: absolute;
@@ -15,6 +17,8 @@
 
 .screen__title {
   font-size: 48px;
+  font-weight: 700;
+  color: $color-gold;
   letter-spacing: 2px;
 }
 

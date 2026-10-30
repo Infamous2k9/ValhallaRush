@@ -24,6 +24,7 @@ function init(): void {
   keyboard.bindEvents();
   bindShortcuts();
   bindButtons();
+  bindDialog();
   updateMuteButton();
 }
 
@@ -38,6 +39,33 @@ function bindButtons(): void {
   getElement('restartButton').addEventListener('click', startGame);
   getElement('homeButton').addEventListener('click', () => showScreen('startScreen'));
   getElement('muteButton').addEventListener('click', toggleMute);
+}
+
+
+/**
+ * Opens the "How to play" dialog. It closes with the X, with Escape
+ * or with a click next to the content (the backdrop belongs to the dialog itself).
+ *
+ * @returns {void}
+ */
+function bindDialog(): void {
+  const dialog = getDialog();
+  getElement('howToPlayButton').addEventListener('click', () => dialog.showModal());
+  getElement('closeDialogButton').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+}
+
+
+/**
+ * @returns {HTMLDialogElement} The "How to play" dialog.
+ * @throws {Error} If the element is missing or not a dialog.
+ */
+function getDialog(): HTMLDialogElement {
+  const dialog = getElement('howToPlayDialog');
+  if (!(dialog instanceof HTMLDialogElement)) throw new Error('#howToPlayDialog is not a <dialog>.');
+  return dialog;
 }
 
 

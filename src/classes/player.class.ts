@@ -207,7 +207,7 @@ export class Player extends MovableObject {
     return !this.isDead() && Date.now() - this.lastInput > SLEEP_DELAY;
   }
 
-  
+
   /**
   * Snores every few seconds while the knight is asleep.
   *
@@ -267,7 +267,7 @@ export class Player extends MovableObject {
    */
   drawSleepIndicator(ctx: CanvasRenderingContext2D): void {
     const rise = (Date.now() / 60) % 25;
-    ctx.font = 'bold 22px serif';
+    ctx.font = 'bold 22px Cinzel, serif';
     ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
     ctx.fillText('Zzz', this.getCenterX(), this.y + 70 - rise);

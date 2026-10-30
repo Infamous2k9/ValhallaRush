@@ -1,0 +1,17 @@
+@use '../variables' as *;
+
+.footer {
+  padding-bottom: 16px;
+  font-size: 14px;
+}
+
+.footer__link {
+  color: $color-text;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+
+  &:hover {
+    color: $color-gold;
+  }
+}

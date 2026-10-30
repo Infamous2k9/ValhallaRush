@@ -1,17 +1,19 @@
 <!doctype html>
-<html lang="de">
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Valhalla Rush</title>
+
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png" />
     <link rel="manifest" href="./assets/favicon/site.webmanifest" />
-
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Valhalla Rush</title>
   </head>
   <body>
-    <h1>Valhalla Rush</h1>
+    <header class="header">
+      <h1 class="header__title">Valhalla Rush</h1>
+    </header>
 
     <main class="game">
       <canvas data-app width="720" height="480"></canvas>
@@ -21,6 +23,7 @@
         <p class="screen__text">Defeat the golem king and collect the runes.</p>
         <div class="screen__actions">
           <button class="btn" id="startButton" type="button">Start</button>
+          <button class="btn btn--secondary" id="howToPlayButton" type="button">How to play</button>
         </div>
       </section>
 
@@ -35,6 +38,39 @@
 
       <button class="mute-btn" id="muteButton" type="button" aria-label="Toggle sound" title="Sound on/off (M)"></button>
     </main>
+
+    <footer class="footer">
+      <a class="footer__link" href="./imprint.html">Imprint &amp; Credits</a>
+    </footer>
+
+    <dialog class="dialog" id="howToPlayDialog" aria-labelledby="howToPlayTitle">
+      <div class="dialog__content">
+        <button class="dialog__close" id="closeDialogButton" type="button" aria-label="Close">&times;</button>
+        <h2 class="dialog__title" id="howToPlayTitle">How to play</h2>
+
+        <p>
+          The golem king has taken the old rune stones from the ruins of Valhalla. Fight your way through
+          his stone army, gather the runes and prove yourself worthy of the halls of the gods.
+        </p>
+
+        <h3 class="dialog__subtitle">Controls</h3>
+        <div class="controls">
+          <span><kbd class="key">←</kbd> <kbd class="key">A</kbd></span><span>Walk left</span>
+          <span><kbd class="key">→</kbd> <kbd class="key">D</kbd></span><span>Walk right</span>
+          <span><kbd class="key">↑</kbd> <kbd class="key">W</kbd></span><span>Jump</span>
+          <span><kbd class="key">Space</kbd></span><span>Sword attack (costs stamina)</span>
+          <span><kbd class="key">M</kbd></span><span>Sound on / off</span>
+        </div>
+
+        <h3 class="dialog__subtitle">Goal</h3>
+        <ul>
+          <li>Defeat the golem king at the end of the level to win.</li>
+          <li>Collect all 8 runes – some can only be reached by jumping.</li>
+          <li>Red potions restore health when you are injured.</li>
+          <li>Watch your green stamina bar – it refills when you don't attack.</li>
+        </ul>
+      </div>
+    </dialog>
 
     <script type="module" src="./src/main.ts"></script>
   </body>
