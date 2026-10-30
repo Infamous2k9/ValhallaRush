@@ -4,6 +4,7 @@ import { hitboxesOverlap } from '../utils/collision';
 import { setStoppableInterval } from '../utils/intervals';
 import type { Keyboard } from './keyboard.class';
 import { MovableObject } from './movable-object.class';
+import { soundManager } from './sound-manager.class';
 
 const START_X = -500;
 const ATTACK_DURATION = 400;
@@ -13,6 +14,7 @@ const STAMINA_REGENERATION = 0.5;
 const SLEEP_DELAY = 10000;
 const SLEEP_FRAMES = PLAYER.idle.flatMap((frame) => [frame, frame, frame]);
 const PLAY_ONCE = [PLAYER.death, PLAYER.attack];
+const SNORE_INTERVAL = 1600;
 
 /**
  * The knight controlled by the player.
@@ -65,6 +67,7 @@ export class Player extends MovableObject {
   animate(): void {
     setStoppableInterval(() => this.handleInput(), 1000 / 25);
     setStoppableInterval(() => this.updateAnimation(), 1000 / 10);
+    setStoppableInterval(() => this.handleSnoring(), SNORE_INTERVAL);
   }
 
 
@@ -149,6 +152,7 @@ export class Player extends MovableObject {
     this.stamina -= ATTACK_COST;
     this.lastAttack = Date.now();
     this.hitTargets.clear();
+    soundManager.play('swordSwing');
   }
 
 
@@ -202,6 +206,16 @@ export class Player extends MovableObject {
   isSleeping(): boolean {
     return !this.isDead() && Date.now() - this.lastInput > SLEEP_DELAY;
   }
+
+  
+  /**
+  * Snores every few seconds while the knight is asleep.
+  *
+  * @returns {void}
+  */
+  handleSnoring(): void {
+    if (this.isSleeping()) soundManager.play('snore');
+}
 
 
   /**

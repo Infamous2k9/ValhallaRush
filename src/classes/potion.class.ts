@@ -1,6 +1,7 @@
 import { setStoppableInterval } from '../utils/intervals';
 import { Collectible } from './collectible.class';
 import type { Player } from './player.class';
+import type { SoundName } from './sound-manager.class';
 
 const SHEET_PATH = './assets/items/potions/potions_small_64.png';
 const FRAME_SIZE = 64;
@@ -13,6 +14,7 @@ const HEAL_AMOUNT = 30;
  */
 export class Potion extends Collectible {
   frame = 0;
+  collectSound: SoundName = 'potionHeal';
 
   /**
    * @param {number} x - Horizontal position.

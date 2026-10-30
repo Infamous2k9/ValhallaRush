@@ -1,6 +1,7 @@
 import { setStoppableInterval } from '../utils/intervals';
 import { Collectible } from './collectible.class';
 import type { Player } from './player.class';
+import type { SoundName } from './sound-manager.class';
 
 const RUNE_PATH = './assets/items/runes/runeBlue_slabOutline_';
 const BOB_HEIGHT = 5;
@@ -10,6 +11,7 @@ const BOB_HEIGHT = 5;
  */
 export class Rune extends Collectible {
   baseY: number;
+  collectSound: SoundName = 'runePickup';
 
   /**
    * @param {number} x - Horizontal position.

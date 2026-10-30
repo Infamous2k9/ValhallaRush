@@ -1,3 +1,4 @@
+import type { SoundName } from '../classes/sound-manager.class';
 import type { Offsets } from './offsets.interface';
 
 /**
@@ -24,4 +25,6 @@ export interface EnemyConfig {
   speed: number;
   activationRange: number;
   offsets: Offsets;
+  hurtSound: SoundName;
+  deathSound: SoundName;
 }

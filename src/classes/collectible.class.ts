@@ -1,5 +1,6 @@
 import { MovableObject } from './movable-object.class';
 import type { Player } from './player.class';
+import type { SoundName } from './sound-manager.class';
 
 /**
  * Base class for items the player can pick up.
@@ -7,6 +8,9 @@ import type { Player } from './player.class';
  */
 export abstract class Collectible extends MovableObject {
   isCollected = false;
+
+  /** Sound that plays when the item is picked up. */
+  abstract collectSound: SoundName;
 
 
   /**

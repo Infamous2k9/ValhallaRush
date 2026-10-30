@@ -1,4 +1,5 @@
 import type { EnemyAnimations, EnemyConfig } from '../interfaces/enemy-config.interface';
+import type { SoundName } from './sound-manager.class';
 import { setStoppableInterval } from '../utils/intervals';
 import { MovableObject } from './movable-object.class';
 
@@ -12,6 +13,8 @@ export class Enemy extends MovableObject {
   activationRange = 0;
   isActivated = false;
   target: MovableObject | null = null;
+  hurtSound: SoundName;
+  deathSound: SoundName;
 
   /**
    * @param {number} x - Horizontal start position.
@@ -21,6 +24,8 @@ export class Enemy extends MovableObject {
     super(x, config.y, config.animations.walking[0]);
     this.animations = config.animations;
     this.idleFrames = [config.animations.walking[0]];
+    this.hurtSound = config.hurtSound;
+    this.deathSound = config.deathSound;
     this.otherDirection = true;
     this.applyConfig(config);
     this.loadAnimations();
@@ -76,8 +81,18 @@ export class Enemy extends MovableObject {
    */
   updateMovement(): void {
     if (this.isDead() || !this.target || this.target.isDead()) return;
-    if (!this.isActivated) this.isActivated = this.isTargetInRange();
+    if (!this.isActivated && this.isTargetInRange()) this.activate();
     if (this.isActivated && !this.isColliding(this.target)) this.moveTowardTarget();
+  }
+
+
+  /**
+   * Wakes the enemy up. Subclasses can add an effect, e.g. a roar.
+   *
+   * @returns {void}
+   */
+  activate(): void {
+    this.isActivated = true;
   }
 
 

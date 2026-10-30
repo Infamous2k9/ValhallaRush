@@ -7,6 +7,7 @@ import type { Level } from './level.class';
 import { MovableObject } from './movable-object.class';
 import { Player } from './player.class';
 import { RuneCounter } from './rune-counter.class';
+import { soundManager } from './sound-manager.class';
 import { StatusBar } from './status-bar.class';
 
 const RED_FILL = './assets/gui/ui-bar/red.png';
@@ -45,6 +46,7 @@ export class World {
     this.hud = this.createHud();
     setStoppableInterval(() => this.checkCollisions(), 20);
     setStoppableInterval(() => this.checkGameEnd(), 100);
+    soundManager.startMusic();
     this.draw();
   }
 
@@ -103,6 +105,7 @@ export class World {
     this.level.collectibles.forEach((item) => {
       if (item.canBeCollectedBy(this.player) && this.player.isColliding(item)) {
         item.collect(this.player);
+        soundManager.play(item.collectSound);
       }
     });
     this.level.removeCollected();
@@ -116,7 +119,10 @@ export class World {
    * @returns {void}
    */
   checkPlayerAttack(enemy: Enemy): void {
-    if (this.player.canHit(enemy)) this.player.hit(enemy);
+    if (!this.player.canHit(enemy)) return;
+    this.player.hit(enemy);
+    soundManager.play('swordHit');
+    soundManager.play(enemy.isDead() ? enemy.deathSound : enemy.hurtSound);
   }
 
 
@@ -128,7 +134,9 @@ export class World {
    */
   checkEnemyContact(enemy: Enemy): void {
     if (this.player.isDead() || this.player.isHurt()) return;
-    if (this.player.isColliding(enemy)) this.player.takeDamage(enemy.damage);
+    if (!this.player.isColliding(enemy)) return;
+    this.player.takeDamage(enemy.damage);
+    soundManager.play(this.player.isDead() ? 'playerDeath' : 'playerHurt');
   }
 
 
@@ -210,6 +218,7 @@ export class World {
     this.isOver = true;
     setTimeout(() => {
       this.stop();
+      soundManager.play(result === 'won' ? 'victory' : 'defeat');
       this.onGameEnd(result);
     }, END_DELAY);
   }
@@ -224,12 +233,13 @@ export class World {
 
 
   /**
-   * Freezes the game by stopping all intervals and the draw loop.
+   * Freezes the game by stopping all intervals, the draw loop and the music.
    *
    * @returns {void}
    */
   stop(): void {
     stopAllIntervals();
     cancelAnimationFrame(this.animationFrameId);
+    soundManager.stopMusic();
   }
 }

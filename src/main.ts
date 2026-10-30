@@ -1,6 +1,7 @@
 import { Keyboard } from './classes/keyboard.class';
 import { World } from './classes/world.class';
 import type { GameResult } from './classes/world.class';
+import { soundManager } from './classes/sound-manager.class';
 import './styles/styles.scss';
 
 // Expose the running game in the DevTools as `game`
@@ -21,8 +22,9 @@ const canvas = document.querySelector<HTMLCanvasElement>('[data-app]');
  */
 function init(): void {
   keyboard.bindEvents();
-  bindDebugToggle();
+  bindShortcuts();
   bindButtons();
+  updateMuteButton();
 }
 
 
@@ -35,6 +37,31 @@ function bindButtons(): void {
   getElement('startButton').addEventListener('click', startGame);
   getElement('restartButton').addEventListener('click', startGame);
   getElement('homeButton').addEventListener('click', () => showScreen('startScreen'));
+  getElement('muteButton').addEventListener('click', toggleMute);
+}
+
+
+/**
+ * Switches all sounds on or off and updates the button.
+ *
+ * @returns {void}
+ */
+function toggleMute(): void {
+  soundManager.toggleMute();
+  updateMuteButton();
+  blurActiveElement();
+}
+
+
+/**
+ * Shows the current mute state on the button.
+ *
+ * @returns {void}
+ */
+function updateMuteButton(): void {
+  const button = getElement('muteButton');
+  button.textContent = soundManager.isMuted ? '🔇' : '🔊';
+  button.setAttribute('aria-pressed', String(soundManager.isMuted));
 }
 
 
@@ -112,13 +139,15 @@ function getElement(id: string): HTMLElement {
 
 
 /**
- * Toggles the hitbox view with the H key.
+ * H toggles the hitbox view, M toggles the sound.
  *
  * @returns {void}
  */
-function bindDebugToggle(): void {
+function bindShortcuts(): void {
   window.addEventListener('keydown', (event) => {
-    if (event.key.toLowerCase() === 'h') window.game?.toggleDebugMode();
+    const key = event.key.toLowerCase();
+    if (key === 'h') window.game?.toggleDebugMode();
+    if (key === 'm') toggleMute();
   });
 }
 
